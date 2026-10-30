@@ -18,6 +18,7 @@ def main():
         cwd=ROOT, check=True, capture_output=True,
     )
     names = sorted(set(result.stdout.decode('utf-8').strip('\0').split('\0')))
+    published_files = set(names)
     errors = []
     links = 0
     for name in names:
@@ -71,6 +72,8 @@ def main():
                 destination = (path.parent / target).resolve()
                 if not destination.is_relative_to(ROOT) or not destination.exists():
                     errors.append(f'{name}: missing local link: {target}')
+                elif destination.is_file() and destination.relative_to(ROOT).as_posix() not in published_files:
+                    errors.append(f'{name}: local link points to an excluded file: {target}')
     for error in errors:
         print(error)
     print(f'Checked {len(names)} candidate files and {links} local links; {len(errors)} issues.')
