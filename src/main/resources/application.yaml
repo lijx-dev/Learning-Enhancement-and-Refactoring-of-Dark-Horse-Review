@@ -7,17 +7,24 @@ spring:
     driver-class-name: com.mysql.jdbc.Driver
     url: jdbc:mysql://127.0.0.1:3306/hmdp?useSSL=false&serverTimezone=UTC
     username: root
-    password: 123
+    password: ${SPRING_DATASOURCE_PASSWORD:}
   redis:
-    host: 192.168.150.101
+    host: 127.0.0.1
     port: 6379
-    password: 123321
+    password: ${SPRING_REDIS_PASSWORD:}
     lettuce:
       pool:
         max-active: 10
         max-idle: 10
         min-idle: 1
         time-between-eviction-runs: 10s
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 6MB
+  flyway:
+    baseline-on-migrate: true
+    baseline-version: 0
   jackson:
     default-property-inclusion: non_null # JSON处理时忽略非空字段
 mybatis-plus:
@@ -27,3 +34,60 @@ logging:
     com.hmdp: debug
   pattern:
     dateformat: mm:ss.SSS
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus
+  metrics:
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
+        hmdp.seckill.consume: true
+        hmdp.cdc.event.delay: true
+        hmdp.mq.consume: true
+        hmdp.mq.send: true
+        hmdp.kafka.event.delay: true
+  endpoint:
+    health:
+      show-details: never
+citylens:
+  reliability:
+    scheduling-enabled: true
+    max-deliveries: 5
+    claim-idle-ms: 30000
+    order-timeout-minutes: 30
+
+hmdp:
+  experience:
+    enabled: ${HMDP_EXPERIENCE_ENABLED:false}
+  analytics:
+    enabled: ${HMDP_ANALYTICS_ENABLED:false}
+    bootstrap-servers: ${HMDP_KAFKA_SERVERS:127.0.0.1:9092}
+    topic: HmdpShopBehavior
+    group: ${HMDP_KAFKA_GROUP:hmdp-heat-v1}
+  mq:
+    enabled: ${HMDP_MQ_ENABLED:false}
+    seckill-enabled: ${HMDP_MQ_SECKILL_ENABLED:false}
+    nameserver: ${HMDP_MQ_NAMESERVER:127.0.0.1:9876}
+    group-prefix: ${HMDP_MQ_GROUP_PREFIX:hmdp}
+    business-topic: HmdpBusiness
+    deadline-topic: HmdpOrderDeadline
+    consumer-enabled: true
+    lease-seconds: 60
+    relay-batch-size: 20
+    send-timeout-ms: 3000
+  monitor-token: ${HMDP_MONITOR_TOKEN:}
+  cache:
+    enabled: true
+  memcache:
+    enabled: ${HMDP_MEMCACHE_ENABLED:false}
+    host: ${HMDP_MEMCACHE_HOST:127.0.0.1}
+    port: ${HMDP_MEMCACHE_PORT:11211}
+    timeout-ms: 100
+  cdc:
+    enabled: ${HMDP_CDC_ENABLED:false}
+    host: ${HMDP_CDC_HOST:127.0.0.1}
+    port: ${HMDP_CDC_PORT:11111}
+    schema: ${HMDP_CDC_SCHEMA:hmdp}
+    destination: ${HMDP_CDC_DESTINATION:example}

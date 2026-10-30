@@ -1,0 +1,252 @@
+{
+  "verified_at": "2026-10-11T12:59:11.121637+08:00",
+  "project": "hm-dianping Java",
+  "purpose": "方法命名与关键设计注释整理",
+  "environment": "hmdp-optimization-test 独立 Compose 环境",
+  "runs": [
+    {
+      "scope": "命名改动后的 24 组全量回归",
+      "passed": true,
+      "tests": 91,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suites": [
+        {
+          "class": "com.hmdp.experience.ExperienceServiceTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "class": "com.hmdp.experience.ExperienceIntegrationTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "class": "com.hmdp.cache.CacheLayersIntegrationTest",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "class": "com.hmdp.cache.CanalBatchTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "class": "com.hmdp.cache.RequestCacheScopeTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "class": "com.hmdp.cache.CacheBenchmarkIntegrationTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "class": "com.hmdp.cache.CacheChangeProjectorTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "class": "com.hmdp.cache.CacheReadTraceTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "class": "com.hmdp.cache.CacheCdcIntegrationTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "class": "com.hmdp.UserLogoutTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "class": "com.hmdp.ShopCacheCompatibilityTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "class": "com.hmdp.reliability.ReliabilityIntegrationTest",
+          "tests": 19,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "class": "com.hmdp.reliability.SeckillMessageTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "class": "com.hmdp.reliability.LoginCodeTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "class": "com.hmdp.reliability.CacheConcurrencyTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "class": "com.hmdp.reliability.AccessGuardTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "class": "com.hmdp.MapperArchitectureTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "class": "com.hmdp.VoucherOrderReliabilityTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "class": "com.hmdp.MockPaymentTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "class": "com.hmdp.ShopSearchBoundaryTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "class": "com.hmdp.messaging.MessagingIntegrationTest",
+          "tests": 14,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "class": "com.hmdp.messaging.RocketMqIntegrationTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "class": "com.hmdp.analytics.KafkaBehaviorIntegrationTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "class": "com.hmdp.analytics.BehaviorAggregationIntegrationTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      ]
+    },
+    {
+      "scope": "最后调整失败处理方法名、变量单位和注释后，重新编译全部源码并复核重点回归",
+      "passed": true,
+      "tests": 37,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suites": [
+        {
+          "class": "com.hmdp.reliability.ReliabilityIntegrationTest",
+          "tests": 19,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "class": "com.hmdp.reliability.CacheConcurrencyTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "class": "com.hmdp.VoucherOrderReliabilityTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "class": "com.hmdp.messaging.MessagingIntegrationTest",
+          "tests": 14,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      ]
+    }
+  ],
+  "unique_test_cases": 91,
+  "count_note": "第二轮 37 项是第一轮 91 项的子集，不能相加为 128 项不同用例。",
+  "style": {
+    "checkstyle_violations": 0,
+    "formatter": "dev/java-style.sh（Google Java Format 1.7，保留 @Resource 独立一行）"
+  },
+  "compatibility": {
+    "http_route_annotations": "与修改前一致",
+    "sql_lua_configuration_resources": "与修改前一致",
+    "production_jdbc_template_references": 0,
+    "inline_resource_declarations": 0
+  },
+  "documentation": {
+    "key_methods_with_design_comments": 26,
+    "updated_source_excerpts": 34,
+    "wiki_relative_links_and_explicit_anchors": "passed"
+  },
+  "examples": {
+    "SeckillServiceImpl.reconcile": "queryInventoryReconciliationReport",
+    "SeckillServiceImpl.fail": "markReservationFailedAndCompensateRedis",
+    "SeckillServiceImpl.complete": "syncReservationStateAndAcknowledgeMessage",
+    "SeckillServiceImpl.publish(voucherId, false)": "publishActivity(voucherId)",
+    "SeckillServiceImpl.publish(voucherId, true)": "recoverActivity(voucherId)",
+    "CacheClient.evictLocal(key)": "advanceLocalCacheGeneration()",
+    "CacheClient.ttl": "calculateTtlMillisWithJitter",
+    "OutboxRelayServiceImpl.drain": "relayOutboxBatch",
+    "UserServiceImpl.signCount": "queryCurrentMonthConsecutiveSignInDays"
+  }
+}

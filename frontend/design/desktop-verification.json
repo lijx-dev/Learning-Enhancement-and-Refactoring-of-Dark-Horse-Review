@@ -1,0 +1,33 @@
+{
+  "date": "2026-10-10",
+  "entry_url": "http://127.0.0.1:8080/",
+  "scope": "desktop_only",
+  "checks": {
+    "javascript_syntax": "passed",
+    "api_unit_tests": {
+      "passed": 8,
+      "failed": 0
+    },
+    "nginx_config": "passed",
+    "git_diff_check": "passed"
+  },
+  "browser_observations": [
+    "首页使用真实探店、分类、精选商家与券数据",
+    "搜索“茶”返回真实的 103 茶餐厅结果",
+    "店铺详情显示照片、3.7 评分、3035 条评价和 47.50 元优惠券",
+    "优惠券列表正确展示现有 50 元券",
+    "访问笔记详情跳转登录，保留返回路径",
+    "登录页面正确渲染且提示本地验证码来源"
+  ],
+  "browser_console": "上述页面未发现 error 或 warn 日志",
+  "screenshot": "design/desktop-home-live.jpg",
+  "limitations": [
+    "未执行真实登录、发布、上传、领取或取消订单等写入操作",
+    "未执行自动浏览器验收测试；仅检查页面展示与匿名浏览跳转",
+    "本地验证码沿用后台日志，未接入短信和在线支付"
+  ],
+  "preservation": {
+    "cityLens": "git status 与实现前一致",
+    "original_course_index_sha256": "b69229ffe88dfffba32321b9846cfa90bbfd4875120eed8cedcd8a9e159f4321"
+  }
+}

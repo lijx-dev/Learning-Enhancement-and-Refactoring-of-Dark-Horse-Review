@@ -1,0 +1,218 @@
+{
+  "verified_at": "2026-10-11T12:44:53.422166+08:00",
+  "project": "hm-dianping Java",
+  "purpose": "Java 可读性重构回归验证",
+  "environment": "hmdp-optimization-test 独立 Compose 环境",
+  "runs": [
+    {
+      "scope": "dev/docker-compose.test.yml 中的 24 组回归（新增 Feed 用例前）",
+      "result": "passed",
+      "tests": 90,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suites": [
+        {
+          "class": "com.hmdp.experience.ExperienceServiceTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "class": "com.hmdp.experience.ExperienceIntegrationTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "class": "com.hmdp.cache.CacheLayersIntegrationTest",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "class": "com.hmdp.cache.CanalBatchTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "class": "com.hmdp.cache.RequestCacheScopeTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "class": "com.hmdp.cache.CacheBenchmarkIntegrationTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "class": "com.hmdp.cache.CacheChangeProjectorTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "class": "com.hmdp.cache.CacheReadTraceTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "class": "com.hmdp.cache.CacheCdcIntegrationTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "class": "com.hmdp.UserLogoutTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "class": "com.hmdp.ShopCacheCompatibilityTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "class": "com.hmdp.reliability.ReliabilityIntegrationTest",
+          "tests": 19,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "class": "com.hmdp.reliability.SeckillMessageTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "class": "com.hmdp.reliability.LoginCodeTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "class": "com.hmdp.reliability.CacheConcurrencyTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "class": "com.hmdp.reliability.AccessGuardTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "class": "com.hmdp.MapperArchitectureTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "class": "com.hmdp.VoucherOrderReliabilityTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "class": "com.hmdp.MockPaymentTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "class": "com.hmdp.ShopSearchBoundaryTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "class": "com.hmdp.messaging.MessagingIntegrationTest",
+          "tests": 13,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "class": "com.hmdp.messaging.RocketMqIntegrationTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "class": "com.hmdp.analytics.KafkaBehaviorIntegrationTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "class": "com.hmdp.analytics.BehaviorAggregationIntegrationTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      ]
+    },
+    {
+      "scope": "新增 Feed 跨批次用例后，重新运行 MessagingIntegrationTest 全组",
+      "result": "passed",
+      "tests": 14,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suites": [
+        {
+          "class": "com.hmdp.messaging.MessagingIntegrationTest",
+          "tests": 14,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      ]
+    }
+  ],
+  "unique_test_cases": 91,
+  "count_note": "90 项原有用例 + 1 项新增 Feed 用例。第二轮 14 项包含已在第一轮运行的 13 项消息用例，不应相加为 104 项独立用例。",
+  "style": {
+    "formatter": "dev/java-style.sh（Google Java Format 1.7，保持 @Resource 独立一行）",
+    "checkstyle_violations": 0
+  },
+  "architecture": {
+    "inline_resource_declarations": 0,
+    "production_jdbc_template_references": 0
+  },
+  "documentation": {
+    "updated_source_excerpts": 15,
+    "links": "relative links and explicit section anchors verified"
+  },
+  "new_regression": "201 名发布前关注粉丝的跨批次投递，重复消息幂等，续传保留原发布时间，发布后关注者不收到历史笔记"
+}

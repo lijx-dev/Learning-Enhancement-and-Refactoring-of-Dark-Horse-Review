@@ -1,0 +1,40 @@
+{
+  "status": "desktop_implementation_running",
+  "image": "home-preview-v1.png",
+  "generation_mode": "built-in image_gen",
+  "product": "黑马点评",
+  "city": "杭州",
+  "mode": "redesign-overhaul",
+  "audience": "寻找商家、优惠券和探店内容的本地生活用户",
+  "visual_language": "暖色、轻编辑感的本地生活界面",
+  "palette": {
+    "background": "#F7F7F4",
+    "surface": "#FFFFFF",
+    "text": "#252622",
+    "primary": "#FF6633"
+  },
+  "typography": "清晰的中文无衬线字体，标题加粗，正文保持易读",
+  "spacing_base_px": 8,
+  "card_radius_px": 16,
+  "banner_radius_px": 24,
+  "dials": {
+    "visual_variance": 5,
+    "motion_intensity": 2,
+    "information_density": 6,
+    "asset_dependence": 8,
+    "brand_fidelity": 6
+  },
+  "desktop": "顶部导航与搜索、紧凑城市横幅、十类入口、三列探店卡片、附近商家与优惠券侧栏",
+  "mobile": "不实现手机端",
+  "implementation_constraints": [
+    "实现仅位于点评目录，新版前端保存在 hm-dianping/frontend",
+    "桌面布局最小宽度 1100px，不实现手机端",
+    "沿用现有后端接口、鉴权、数据与订单逻辑，不写入设计示例数据",
+    "保留原课程前端，可通过 HMDP_FRONTEND_DIR 切换",
+    "不修改 CityLens 项目"
+  ],
+  "prompt_summary": "生成黑马点评杭州首页的高保真改版示例图，桌面与移动双端同屏。采用暖白底色、点评橙、深灰中文字体、8px间距、16px卡片圆角和轻边框。桌面展示导航搜索、城市照片横幅、十类入口、三列达人探店、附近好店及优惠券；移动展示一致内容、双列卡片和原有底部导航。使用自然餐厅、咖啡和杭州景观照片。中文清晰，无后台或AI技术内容，底部标明示例内容。",
+  "preview_scope": "历史示例图包含桌面与手机，仅桌面版本经用户确认实施",
+  "implemented_scope": "desktop_only",
+  "entry_url": "http://127.0.0.1:8080/"
+}

@@ -10,16 +10,16 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RedissonConfig {
 
-    @Bean
-    public RedissonClient redissonClient(
-            @Value("${spring.redis.host}") String host,
-            @Value("${spring.redis.port:6379}") int port,
-            @Value("${spring.redis.password:}") String password){
-        Config config = new Config();
-        config.useSingleServer().setAddress("redis://" + host + ":" + port);
-        if (password != null && !password.isEmpty()) {
-            config.useSingleServer().setPassword(password);
-        }
-        return Redisson.create(config);
+  @Bean
+  public RedissonClient redissonClient(
+      @Value("${spring.redis.host}") String host,
+      @Value("${spring.redis.port:6379}") int port,
+      @Value("${spring.redis.password:}") String password) {
+    Config config = new Config();
+    config.useSingleServer().setAddress("redis://" + host + ":" + port);
+    if (password != null && !password.isEmpty()) {
+      config.useSingleServer().setPassword(password);
     }
+    return Redisson.create(config);
+  }
 }

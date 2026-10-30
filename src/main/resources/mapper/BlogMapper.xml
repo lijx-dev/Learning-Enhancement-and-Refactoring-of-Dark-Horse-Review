@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hmdp.mapper.BlogMapper">
+
+    <select id="countLike" resultType="Long">
+        SELECT COUNT(*)
+        FROM tb_blog_like
+        WHERE blog_id=#{blogId} AND user_id=#{userId}
+    </select>
+
+    <select id="selectIdForUpdate" resultType="map">
+        SELECT id
+        FROM tb_blog
+        WHERE id=#{blogId} FOR UPDATE
+    </select>
+
+    <insert id="insertLike">
+        INSERT INTO tb_blog_like(blog_id,user_id)
+        VALUES(#{blogId},#{userId})
+    </insert>
+
+    <update id="incrementLikes">
+        UPDATE tb_blog
+        SET liked=liked+1
+        WHERE id=#{blogId}
+    </update>
+
+    <delete id="deleteLike">
+        DELETE
+        FROM tb_blog_like
+        WHERE blog_id=#{blogId} AND user_id=#{userId}
+    </delete>
+
+    <update id="decrementLikes">
+        UPDATE tb_blog
+        SET liked=GREATEST(0,liked-1)
+        WHERE id=#{blogId}
+    </update>
+
+    <select id="selectFirstLikeUserIds" resultType="Long">
+        SELECT user_id
+        FROM tb_blog_like
+        WHERE blog_id=#{blogId}
+        ORDER BY created_at,user_id LIMIT 5
+    </select>
+
+    <select id="selectLikedBlogIds" resultType="Long">
+        SELECT blog_id
+        FROM tb_blog_like
+        WHERE user_id = #{userId}
+        <choose>
+            <when test="blogIds != null and !blogIds.isEmpty()">
+                AND blog_id IN
+                <foreach collection="blogIds" item="blogId" open="(" separator="," close=")">
+                    #{blogId}
+                </foreach>
+            </when>
+            <otherwise>
+                AND 1 = 0
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="selectLikeTimestamp" resultType="map">
+        SELECT created_at
+        FROM tb_blog_like
+        WHERE blog_id=#{blogId} AND user_id=#{userId}
+    </select>
+</mapper>

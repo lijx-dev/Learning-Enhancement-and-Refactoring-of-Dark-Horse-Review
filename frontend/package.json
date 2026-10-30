@@ -1,0 +1,9 @@
+{
+  "name": "hmdp-desktop",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "node --check scripts/api.js && node --check scripts/components.js && node --check scripts/app.js && node --check scripts/experience.js && node --check scripts/experience-helpers.js",
+    "test": "node --test tests/*.test.js"
+  }
+}

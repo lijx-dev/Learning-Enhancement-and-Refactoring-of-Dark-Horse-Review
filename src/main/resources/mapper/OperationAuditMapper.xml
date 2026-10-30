@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hmdp.mapper.OperationAuditMapper">
+
+    <insert id="insertAudit">
+        INSERT INTO tb_operation_audit(user_id,method,path,http_status)
+        VALUES(#{userId},#{method},#{path},#{httpStatus})
+    </insert>
+</mapper>

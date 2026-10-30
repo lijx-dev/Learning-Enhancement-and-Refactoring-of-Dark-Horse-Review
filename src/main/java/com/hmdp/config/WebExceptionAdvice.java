@@ -9,9 +9,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class WebExceptionAdvice {
 
-    @ExceptionHandler(RuntimeException.class)
-    public Result handleRuntimeException(RuntimeException e) {
-        log.error(e.toString(), e);
-        return Result.fail("服务器异常");
-    }
+  @ExceptionHandler(RuntimeException.class)
+  public Result handleRuntimeException(RuntimeException e) {
+    log.error(e.toString(), e);
+    return Result.fail("服务器异常");
+  }
 }

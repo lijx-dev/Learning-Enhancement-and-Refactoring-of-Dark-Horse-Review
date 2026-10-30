@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hmdp.mapper.FollowMapper">
+
+    <insert id="insertEdge">
+        INSERT IGNORE INTO tb_follow_edge(user_id,follow_user_id)
+        VALUES(#{userId},#{followUserId})
+    </insert>
+
+    <delete id="deleteEdge">
+        DELETE
+        FROM tb_follow_edge
+        WHERE user_id=#{userId} AND follow_user_id=#{followUserId}
+    </delete>
+
+    <select id="countEdge" resultType="Long">
+        SELECT COUNT(*)
+        FROM tb_follow_edge
+        WHERE user_id=#{userId} AND follow_user_id=#{followUserId}
+    </select>
+
+    <select id="selectCommonFollowIds" resultType="Long">
+        SELECT a.follow_user_id
+        FROM tb_follow_edge a
+        JOIN tb_follow_edge b ON a.follow_user_id=b.follow_user_id
+        WHERE a.user_id=#{userId} AND b.user_id=#{otherUserId} LIMIT 100
+    </select>
+
+    <select id="selectFanBatch" resultType="map">
+        SELECT id,user_id
+        FROM tb_follow_edge
+        WHERE follow_user_id=#{authorId} AND id&gt;#{cursorId} AND created_at&lt;=#{publishedAt}
+        ORDER BY id LIMIT 200
+    </select>
+</mapper>

@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hmdp.mapper.SeckillReservationMapper">
+
+    <resultMap id="SeckillReservationMap" type="com.hmdp.entity.SeckillReservation">
+        <result column="order_id" property="orderId"/>
+        <result column="voucher_id" property="voucherId"/>
+        <result column="user_id" property="userId"/>
+        <result column="state" property="state"/>
+        <result column="attempts" property="attempts"/>
+        <result column="reason" property="reason"/>
+    </resultMap>
+
+    <select id="selectDeadLetters" resultType="map">
+        SELECT *
+        FROM tb_seckill_dead_letter
+        ORDER BY created_at DESC LIMIT 100
+    </select>
+
+    <select id="countByVoucherId" resultType="Long">
+        SELECT COUNT(*)
+        FROM tb_seckill_reservation
+        WHERE voucher_id=#{voucherId}
+    </select>
+
+    <select id="countReviewRequests" resultType="Long">
+        SELECT COUNT(*)
+        FROM tb_seckill_reservation
+        WHERE state='REVIEW'
+    </select>
+
+    <update id="recordAttempt">
+        UPDATE tb_seckill_reservation
+        SET attempts=attempts+1,reason=#{reason}
+        WHERE order_id=#{orderId} AND state='PROCESSING'
+    </update>
+
+    <select id="selectAttemptState" resultMap="SeckillReservationMap">
+        SELECT state,attempts
+        FROM tb_seckill_reservation
+        WHERE order_id=#{orderId}
+    </select>
+
+    <select id="selectStateForUpdate" resultMap="SeckillReservationMap">
+        SELECT state
+        FROM tb_seckill_reservation
+        WHERE order_id=#{orderId} FOR UPDATE
+    </select>
+
+    <update id="markProcessingForReview">
+        UPDATE tb_seckill_reservation
+        SET state='REVIEW',reason=#{reason}
+        WHERE order_id=#{orderId} AND state='PROCESSING'
+    </update>
+
+    <insert id="insertDeadLetter">
+        INSERT IGNORE INTO tb_seckill_dead_letter(message_id,order_id,payload,reason)
+        VALUES(#{messageId},#{orderId},#{payload},#{reason})
+    </insert>
+
+    <select id="selectFulfillment" resultMap="SeckillReservationMap">
+        SELECT voucher_id,user_id,state
+        FROM tb_seckill_reservation
+        WHERE order_id=#{orderId}
+    </select>
+
+    <insert id="insertReservation">
+        INSERT IGNORE INTO tb_seckill_reservation(order_id,voucher_id,user_id)
+        VALUES(#{orderId},#{voucherId},#{userId})
+    </insert>
+
+    <select id="selectReservation" resultMap="SeckillReservationMap">
+        SELECT *
+        FROM tb_seckill_reservation
+        WHERE order_id=#{orderId}
+    </select>
+
+    <update id="markSuccess">
+        UPDATE tb_seckill_reservation
+        SET state='SUCCESS',reason=NULL
+        WHERE order_id=#{orderId}
+    </update>
+
+    <select id="selectState" resultType="String">
+        SELECT state
+        FROM tb_seckill_reservation
+        WHERE order_id=#{orderId}
+    </select>
+
+    <select id="selectOwnedRequest" resultType="map">
+        SELECT order_id,voucher_id,state,reason,created_at
+        FROM tb_seckill_reservation
+        WHERE order_id=#{orderId} AND user_id=#{userId}
+    </select>
+
+    <select id="countUnfinishedRequests" resultType="Long">
+        SELECT COUNT(*)
+        FROM tb_seckill_reservation
+        WHERE voucher_id=#{voucherId} AND state IN ('PROCESSING','REVIEW')
+    </select>
+
+    <select id="selectSuccessfulBuyers" resultType="map">
+        SELECT order_id,user_id
+        FROM tb_seckill_reservation
+        WHERE voucher_id=#{voucherId} AND state='SUCCESS'
+    </select>
+
+    <select id="selectReservationForUpdate" resultMap="SeckillReservationMap">
+        SELECT *
+        FROM tb_seckill_reservation
+        WHERE order_id=#{orderId} FOR UPDATE
+    </select>
+
+    <update id="resetForRetry">
+        UPDATE tb_seckill_reservation
+        SET state='PROCESSING',attempts=0
+        WHERE order_id=#{orderId}
+    </update>
+
+    <update id="markFailed">
+        UPDATE tb_seckill_reservation
+        SET state='FAILED'
+        WHERE order_id=#{orderId}
+    </update>
+
+    <select id="selectReviewRequests" resultType="map">
+        SELECT order_id,voucher_id,user_id,state,attempts,reason,updated_at
+        FROM tb_seckill_reservation
+        WHERE state IN ('REVIEW','FAILED')
+        ORDER BY updated_at DESC LIMIT 100
+    </select>
+</mapper>

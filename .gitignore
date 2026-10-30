@@ -31,3 +31,23 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Local configuration, credentials and runtime data ###
+.env
+.env.*
+!.env.example
+!**/.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.keystore
+data/
+uploads/
+*.log
+*.pid
+node_modules/
+__pycache__/
+*.py[cod]
+.DS_Store
+Thumbs.db

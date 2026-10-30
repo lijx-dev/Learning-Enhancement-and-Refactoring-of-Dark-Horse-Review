@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hmdp.mapper.CacheCheckpointMapper">
+
+    <insert id="saveCheckpoint">
+        INSERT INTO tb_cache_cdc_checkpoint(destination,batch_id,binlog_file,binlog_offset,event_time_ms)
+        VALUES(#{destination},#{batchId},#{binlogFile},#{binlogOffset},#{eventTimeMs})
+        ON DUPLICATE KEY UPDATE batch_id=VALUES(batch_id),binlog_file=VALUES(binlog_file),binlog_offset=VALUES(binlog_offset),event_time_ms=VALUES(event_time_ms),processed_at=CURRENT_TIMESTAMP(3)
+    </insert>
+</mapper>

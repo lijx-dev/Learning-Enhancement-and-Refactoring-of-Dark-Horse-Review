@@ -1,0 +1,205 @@
+{
+  "generatedAt": "2026-10-10T15:13:58.466556+00:00",
+  "scope": "隔离数据库 hmdp_optimization_test，完整回归命令一次通过；不等同于访客点击页面运行全部测试",
+  "tests": 90,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "suites": [
+    {
+      "name": "com.hmdp.MapperArchitectureTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.hmdp.MockPaymentTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.hmdp.ShopCacheCompatibilityTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.hmdp.ShopSearchBoundaryTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.hmdp.UserLogoutTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.hmdp.VoucherOrderReliabilityTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.hmdp.analytics.BehaviorAggregationIntegrationTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.hmdp.analytics.KafkaBehaviorIntegrationTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.hmdp.cache.CacheBenchmarkIntegrationTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.hmdp.cache.CacheCdcIntegrationTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.hmdp.cache.CacheChangeProjectorTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.hmdp.cache.CacheLayersIntegrationTest",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.hmdp.cache.CacheReadTraceTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.hmdp.cache.CanalBatchTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.hmdp.cache.RequestCacheScopeTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.hmdp.experience.ExperienceIntegrationTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.hmdp.experience.ExperienceServiceTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.hmdp.messaging.MessagingIntegrationTest",
+      "tests": 13,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.hmdp.messaging.RocketMqIntegrationTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.hmdp.reliability.AccessGuardTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.hmdp.reliability.CacheConcurrencyTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.hmdp.reliability.LoginCodeTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.hmdp.reliability.ReliabilityIntegrationTest",
+      "tests": 19,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.hmdp.reliability.SeckillMessageTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  ],
+  "checkstylePassed": true,
+  "checkstyleSkipped": false,
+  "frontendTests": 12,
+  "browserObservations": {
+    "cache": {
+      "requests": 3,
+      "reads": 6,
+      "scopeHits": 3,
+      "mysqlLoads": 0,
+      "observedLayers": [
+        "Redis",
+        "Caffeine",
+        "请求内缓存"
+      ]
+    },
+    "kafka": {
+      "submitted": 3,
+      "persisted": 3,
+      "pvBefore": 6,
+      "pvAfterRefresh": 9,
+      "loggedUv": 0
+    },
+    "order": "新接口的订单归属及 Outbox 查询在隔离 HTTP 测试通过；当前匿名页面未提交业务订单",
+    "screenshot": "frontend/design/experience-live.jpg"
+  },
+  "reproduction": "docker compose -p hmdp-optimization-test -f dev/docker-compose.test.yml run --rm test",
+  "googleJavaFormatPassed": true
+}

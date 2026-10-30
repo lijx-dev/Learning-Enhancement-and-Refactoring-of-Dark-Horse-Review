@@ -10,4 +10,11 @@
         LEFT JOIN  tb_seckill_voucher sv ON v.id = sv.voucher_id
         WHERE v.shop_id = #{shopId} AND v.status = 1
     </select>
+
+    <select id="selectActiveVoucherIds" resultType="Long">
+        SELECT id
+        FROM tb_voucher
+        WHERE shop_id=#{shopId} AND status=1
+        ORDER BY id
+    </select>
 </mapper>

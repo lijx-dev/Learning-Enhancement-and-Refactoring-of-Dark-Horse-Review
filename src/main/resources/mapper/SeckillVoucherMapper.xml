@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hmdp.mapper.SeckillVoucherMapper">
+
+    <resultMap id="SeckillPublicationMap" type="com.hmdp.entity.SeckillPublication">
+        <result column="voucher_id" property="voucherId"/>
+        <result column="stock" property="stock"/>
+        <result column="begin_time" property="beginTime"/>
+        <result column="end_time" property="endTime"/>
+        <result column="status" property="status"/>
+    </resultMap>
+
+    <select id="selectPublicationStates" resultType="map">
+        SELECT sv.voucher_id,a.has_published
+        FROM tb_seckill_voucher sv
+        LEFT JOIN tb_seckill_activity a ON a.voucher_id=sv.voucher_id
+    </select>
+
+    <update id="markPublished">
+        UPDATE tb_seckill_activity
+        SET has_published=1
+        WHERE voucher_id=#{voucherId}
+    </update>
+
+    <select id="selectPublicationDetails" resultMap="SeckillPublicationMap">
+        SELECT sv.*,v.status+0 AS status
+        FROM tb_seckill_voucher sv
+        JOIN tb_voucher v ON v.id=sv.voucher_id
+        WHERE sv.voucher_id=#{voucherId}
+    </select>
+
+    <select id="selectPublishedFlag" resultType="Integer">
+        SELECT has_published
+        FROM tb_seckill_activity
+        WHERE voucher_id=#{voucherId}
+    </select>
+
+    <select id="selectInventory" resultType="map">
+        SELECT a.total_stock,s.stock
+        FROM tb_seckill_activity a
+        JOIN tb_seckill_voucher s USING(voucher_id)
+        WHERE voucher_id=#{voucherId}
+    </select>
+
+    <select id="selectActivityVoucherIds" resultType="Long">
+        SELECT voucher_id
+        FROM tb_seckill_activity
+    </select>
+
+    <insert id="insertActivity">
+        INSERT INTO tb_seckill_activity(voucher_id,total_stock)
+        VALUES(#{voucherId},#{totalStock})
+    </insert>
+</mapper>

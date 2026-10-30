@@ -1,0 +1,6 @@
+.env
+app.jar
+hmdp.sql
+frontend/
+images/
+*.tar.gz

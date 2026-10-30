@@ -1,0 +1,221 @@
+name: hm-dianping
+services:
+  kafka-volume-init:
+    image: apache/kafka:3.9.1
+    user: '0'
+    entrypoint: [/bin/sh, -c]
+    command: ['chown appuser:appuser /tmp/kraft-combined-logs']
+    volumes:
+      - kafka-data:/tmp/kraft-combined-logs
+  kafka:
+    image: apache/kafka:3.9.1
+    environment:
+      KAFKA_NODE_ID: '1'
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: '1'
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: '1'
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: '1'
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'false'
+      KAFKA_LOG_RETENTION_HOURS: '72'
+      KAFKA_LOG_DIRS: /tmp/kraft-combined-logs
+      KAFKA_HEAP_OPTS: '-Xms256m -Xmx512m'
+    volumes:
+      - kafka-data:/tmp/kraft-combined-logs
+    depends_on:
+      kafka-volume-init:
+        condition: service_completed_successfully
+    healthcheck:
+      test: [CMD-SHELL, '/opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka:9092 --list >/dev/null']
+      interval: 10s
+      timeout: 8s
+      retries: 30
+  kafka-init:
+    image: apache/kafka:3.9.1
+    entrypoint: [/bin/sh, -c]
+    command: ['exec /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka:9092 --create --if-not-exists --topic HmdpShopBehavior --partitions 3 --replication-factor 1 --config retention.ms=259200000']
+    depends_on:
+      kafka:
+        condition: service_healthy
+  mq-nameserver:
+    image: apache/rocketmq:5.3.2
+    platform: linux/amd64
+    command: [sh, mqnamesrv]
+    environment:
+      JAVA_OPT_EXT: '-Xms128m -Xmx128m -Xmn64m'
+  mq-volume-init:
+    image: apache/rocketmq:5.3.2
+    platform: linux/amd64
+    user: '0'
+    command: [sh, -c, 'chown rocketmq:rocketmq /home/rocketmq/store']
+    volumes:
+      - rocketmq-data:/home/rocketmq/store
+  rocketmq:
+    image: apache/rocketmq:5.3.2
+    platform: linux/amd64
+    command: [sh, mqbroker, -c, /etc/rocketmq/broker.conf]
+    environment:
+      JAVA_OPT_EXT: '-Xms512m -Xmx512m -Xmn128m -XX:MaxDirectMemorySize=256m'
+    volumes:
+      - ./rocketmq/broker.conf:/etc/rocketmq/broker.conf:ro
+      - rocketmq-data:/home/rocketmq/store
+    depends_on:
+      mq-nameserver:
+        condition: service_started
+      mq-volume-init:
+        condition: service_completed_successfully
+    healthcheck:
+      test: [CMD-SHELL, 'sh mqadmin clusterList -n mq-nameserver:9876 | grep -q hmdp-broker']
+      interval: 10s
+      timeout: 8s
+      retries: 30
+  mq-init:
+    image: apache/rocketmq:5.3.2
+    platform: linux/amd64
+    command: [sh, /etc/rocketmq/init.sh]
+    environment:
+      JAVA_OPT_EXT: '-Xms64m -Xmx128m'
+    volumes:
+      - ./rocketmq/init.sh:/etc/rocketmq/init.sh:ro
+    depends_on:
+      rocketmq:
+        condition: service_healthy
+  mysql:
+    image: mysql:8.0
+    command: --default-authentication-plugin=mysql_native_password --sql-mode=NO_ENGINE_SUBSTITUTION --server-id=1 --log-bin=mysql-bin --binlog-format=ROW --binlog-row-image=FULL --binlog-expire-logs-seconds=604800
+    environment:
+      MYSQL_ROOT_PASSWORD: ${HMDP_MYSQL_PASSWORD:-hmdp_local_only}
+      MYSQL_DATABASE: hmdp
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ../src/main/resources/db/hmdp.sql:/docker-entrypoint-initdb.d/01-hmdp.sql:ro
+      - ./mysql/02-canal.sql:/docker-entrypoint-initdb.d/02-canal.sql:ro
+    healthcheck:
+      test: [CMD-SHELL, 'mysqladmin ping -h 127.0.0.1 -p$$MYSQL_ROOT_PASSWORD --silent']
+      interval: 5s
+      timeout: 3s
+      retries: 60
+  redis:
+    image: redis:7-alpine
+    command: redis-server --appendonly yes --appendfsync always
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: [CMD, redis-cli, ping]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+  memcached:
+    image: memcached:1.6-alpine
+    command: [memcached, -m, '64', -I, 2m]
+  canal:
+    image: canal/canal-server:v1.1.8
+    platform: linux/amd64
+    pull_policy: if_not_present
+    environment:
+      canal.destinations: example
+      canal.auto.scan: 'false'
+      canal.instance.master.address: mysql:3306
+      canal.instance.dbUsername: canal
+      canal.instance.dbPassword: hmdp_canal_local_only
+      canal.instance.mysql.slaveId: '1234'
+      canal.instance.filter.regex: 'hmdp\.(tb_shop|tb_voucher|tb_seckill_voucher)'
+      canal.instance.tsdb.enable: 'true'
+    volumes:
+      - canal-meta:/home/admin/canal-server/conf/example
+    depends_on:
+      mysql:
+        condition: service_healthy
+  java:
+    image: maven:3.9-eclipse-temurin-8
+    working_dir: /workspace
+    command: [mvn, -DskipTests, spring-boot:run]
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/hmdp?useSSL=false&serverTimezone=UTC&characterEncoding=utf8
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: ${HMDP_MYSQL_PASSWORD:-hmdp_local_only}
+      SPRING_REDIS_HOST: redis
+      SPRING_REDIS_PORT: '6379'
+      SPRING_REDIS_PASSWORD: ''
+      HMDP_MEMCACHE_ENABLED: 'true'
+      HMDP_MEMCACHE_HOST: memcached
+      HMDP_CDC_ENABLED: 'true'
+      HMDP_CDC_HOST: canal
+      HMDP_CDC_SCHEMA: hmdp
+      HMDP_MQ_ENABLED: 'true'
+      HMDP_MQ_SECKILL_ENABLED: 'true'
+      HMDP_MQ_NAMESERVER: mq-nameserver:9876
+      HMDP_ANALYTICS_ENABLED: 'true'
+      HMDP_EXPERIENCE_ENABLED: ${HMDP_EXPERIENCE_ENABLED:-true}
+      HMDP_KAFKA_SERVERS: kafka:9092
+      HMDP_MONITOR_TOKEN: ${HMDP_MONITOR_TOKEN:-hmdp_dev_metrics}
+      HMDP_UPLOAD_DIR: /uploads
+      CITYLENS_CATALOG_ADMIN_IDS: ${HMDP_ADMIN_IDS:-}
+      CITYLENS_PAYMENT_MOCK_ENABLED: ${HMDP_PAYMENT_MOCK_ENABLED:-false}
+    ports:
+      - '127.0.0.1:${HMDP_API_PORT:-8081}:8081'
+    volumes:
+      - ..:/workspace
+      - maven-cache:/root/.m2
+      - uploads:/uploads
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      memcached:
+        condition: service_started
+      canal:
+        condition: service_started
+      mq-init:
+        condition: service_completed_successfully
+      kafka-init:
+        condition: service_completed_successfully
+  web:
+    image: nginx:alpine
+    ports:
+      - '127.0.0.1:${HMDP_WEB_PORT:-8080}:80'
+    volumes:
+      - ${HMDP_FRONTEND_DIR:-../frontend}:/usr/share/nginx/html:ro
+      - uploads:/usr/share/nginx/hmdp-images:ro
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - java
+  prometheus:
+    image: prom/prometheus:v2.55.1
+    profiles: [monitoring]
+    entrypoint: [/bin/sh, /etc/prometheus/start.sh]
+    environment:
+      HMDP_MONITOR_TOKEN: ${HMDP_MONITOR_TOKEN:-hmdp_dev_metrics}
+    ports:
+      - '127.0.0.1:${HMDP_METRICS_PORT:-9091}:9090'
+    volumes:
+      - ./monitoring:/etc/prometheus:ro
+      - prometheus-data:/prometheus
+    depends_on:
+      - java
+      - alertmanager
+  alertmanager:
+    image: prom/alertmanager:v0.27.0
+    profiles: [monitoring]
+    command: [--config.file=/etc/alertmanager/alertmanager.yml, --storage.path=/alertmanager]
+    ports:
+      - '127.0.0.1:${HMDP_ALERT_PORT:-9094}:9093'
+    volumes:
+      - ./monitoring/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+      - alertmanager-data:/alertmanager
+volumes:
+  kafka-data:
+  rocketmq-data:
+  canal-meta:
+  prometheus-data:
+  alertmanager-data:
+  mysql-data:
+  redis-data:
+  maven-cache:
+  uploads:

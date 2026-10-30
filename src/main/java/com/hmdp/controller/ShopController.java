@@ -1,24 +1,22 @@
 package com.hmdp.controller;
 
-
-import cn.hutool.core.util.StrUtil;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.hmdp.dto.Result;
 import com.hmdp.dto.ShopSearchDTO;
 import com.hmdp.entity.Shop;
 import com.hmdp.service.IShopService;
-import com.hmdp.utils.SystemConstants;
-import org.springframework.web.bind.annotation.*;
-
-import javax.annotation.Resource;
 import java.util.List;
-import java.util.stream.Collectors;
+import javax.annotation.Resource;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
- * <p>
  * 前端控制器
- * </p>
  *
  * @author 虎哥
  */
@@ -26,120 +24,98 @@ import java.util.stream.Collectors;
 @RequestMapping("/shop")
 public class ShopController {
 
-    @Resource
-    public IShopService shopService;
+  @Resource
+  private IShopService shopService;
+  /**
+   * 根据id查询商铺信息
+   *
+   * @param id 商铺id
+   * @return 商铺详情数据
+   */
+  @GetMapping("/{id}")
+  public Result queryShopById(@PathVariable("id") Long id) {
+    return shopService.queryShopDetail(id);
+  }
 
-    /**
-     * 根据id查询商铺信息
-     * @param id 商铺id
-     * @return 商铺详情数据
-     */
-    @GetMapping("/{id}")
-    public Result queryShopById(@PathVariable("id") Long id) {
-        return shopService.queryById(id);
-    }
+  /** 供 CityLens 使用的只读组合搜索，评分参数按数据库的 10 倍整数传入。 */
+  @GetMapping("/search")
+  public Result searchShops(ShopSearchDTO criteria) {
+    return shopService.searchShops(criteria);
+  }
 
-    /** 供 CityLens 使用的只读组合搜索，评分参数按数据库的 10 倍整数传入。 */
-    @GetMapping("/search")
-    public Result searchShops(ShopSearchDTO criteria) {
-        return shopService.searchShops(criteria);
-    }
+  /** 统一前端的跨分类店铺列表；Agent 的严格搜索接口保持原有条件。 */
+  @GetMapping("/catalog")
+  public Result catalog(
+      @RequestParam(value = "keyword", defaultValue = "") String keyword,
+      @RequestParam(value = "typeId", required = false) Long typeId,
+      @RequestParam(value = "page", defaultValue = "1") Integer page,
+      @RequestParam(value = "size", defaultValue = "12") Integer size,
+      @RequestParam(value = "sort", defaultValue = "score") String sort) {
+    return shopService.catalog(keyword, typeId, page, size, sort);
+  }
 
-    /** 统一前端的跨分类店铺列表；Agent 的严格搜索接口保持原有条件。 */
-    @GetMapping("/catalog")
-    public Result catalog(@RequestParam(value = "keyword", defaultValue = "") String keyword,
-                          @RequestParam(value = "typeId", required = false) Long typeId,
-                          @RequestParam(value = "page", defaultValue = "1") Integer page,
-                          @RequestParam(value = "size", defaultValue = "12") Integer size,
-                          @RequestParam(value = "sort", defaultValue = "score") String sort) {
-        if (page < 1 || page > 10000 || size < 1 || size > 20 || keyword.length() > 50
-                || (typeId != null && typeId <= 0) || !("score".equals(sort) || "price".equals(sort))) {
-            return Result.fail("店铺查询参数无效");
-        }
-        QueryWrapper<Shop> query = new QueryWrapper<>();
-        query.eq(typeId != null, "type_id", typeId).like(StrUtil.isNotBlank(keyword), "name", keyword.trim());
-        if ("price".equals(sort)) query.orderByAsc("avg_price");
-        else query.orderByDesc("score");
-        query.orderByAsc("id");
-        Page<Shop> result = shopService.page(new Page<>(page, size), query);
-        return Result.ok(result.getRecords(), result.getTotal());
-    }
+  /** CityLens 在组合两站前批量复核候选，直接读取当前店铺数据。 */
+  @GetMapping("/batch")
+  public Result queryShopsByIds(@RequestParam("ids") List<Long> ids) {
+    return shopService.queryShopsByIds(ids);
+  }
 
-    /** CityLens 在组合两站前批量复核候选，直接读取当前店铺数据。 */
-    @GetMapping("/batch")
-    public Result queryShopsByIds(@RequestParam("ids") List<Long> ids) {
-        if (ids == null || ids.isEmpty() || ids.size() > 40 || ids.stream().anyMatch(id -> id == null || id <= 0)) {
-            return Result.fail("ids 必须包含 1~40 个正整数");
-        }
-        List<Long> uniqueIds = ids.stream().distinct().collect(Collectors.toList());
-        return Result.ok(shopService.listByIds(uniqueIds));
-    }
+  /** 供 CityLens 在用户原话中匹配真实商圈，避免猜测地名。 */
+  @GetMapping("/areas")
+  public Result listAreas() {
+    return shopService.listAreas();
+  }
 
-    /** 供 CityLens 在用户原话中匹配真实商圈，避免猜测地名。 */
-    @GetMapping("/areas")
-    public Result listAreas() {
-        List<String> areas = shopService.list(new QueryWrapper<Shop>()
-                        .select("DISTINCT area").isNotNull("area").ne("area", ""))
-                .stream().map(Shop::getArea).sorted().collect(Collectors.toList());
-        return Result.ok(areas);
-    }
+  /**
+   * 新增商铺信息
+   *
+   * @param shop 商铺数据
+   * @return 商铺id
+   */
+  @PostMapping
+  public Result saveShop(@RequestBody Shop shop) {
+    return shopService.saveShop(shop);
+  }
 
-    /**
-     * 新增商铺信息
-     * @param shop 商铺数据
-     * @return 商铺id
-     */
-    @PostMapping
-    public Result saveShop(@RequestBody Shop shop) {
-        // 写入数据库
-        shopService.save(shop);
-        // 返回店铺id
-        return Result.ok(shop.getId());
-    }
+  /**
+   * 更新商铺信息
+   *
+   * @param shop 商铺数据
+   * @return 无
+   */
+  @PutMapping
+  public Result updateShop(@RequestBody Shop shop) {
+    // 写入数据库
+    return shopService.update(shop);
+  }
 
-    /**
-     * 更新商铺信息
-     * @param shop 商铺数据
-     * @return 无
-     */
-    @PutMapping
-    public Result updateShop(@RequestBody Shop shop) {
-        // 写入数据库
-        return shopService.update(shop);
-    }
+  /**
+   * 根据商铺类型分页查询商铺信息
+   *
+   * @param typeId 商铺类型
+   * @param current 页码
+   * @return 商铺列表
+   */
+  @GetMapping("/of/type")
+  public Result queryShopByType(
+      @RequestParam("typeId") Integer typeId,
+      @RequestParam(value = "current", defaultValue = "1") Integer current,
+      @RequestParam(value = "x", required = false) Double x,
+      @RequestParam(value = "y", required = false) Double y) {
+    return shopService.queryShopByType(typeId, current, x, y);
+  }
 
-    /**
-     * 根据商铺类型分页查询商铺信息
-     * @param typeId 商铺类型
-     * @param current 页码
-     * @return 商铺列表
-     */
-    @GetMapping("/of/type")
-    public Result queryShopByType(
-            @RequestParam("typeId") Integer typeId,
-            @RequestParam(value = "current", defaultValue = "1") Integer current,
-            @RequestParam(value = "x", required = false) Double x,
-            @RequestParam(value = "y", required = false) Double y
-    ) {
-       return shopService.queryShopByType(typeId, current, x, y);
-    }
-
-    /**
-     * 根据商铺名称关键字分页查询商铺信息
-     * @param name 商铺名称关键字
-     * @param current 页码
-     * @return 商铺列表
-     */
-    @GetMapping("/of/name")
-    public Result queryShopByName(
-            @RequestParam(value = "name", required = false) String name,
-            @RequestParam(value = "current", defaultValue = "1") Integer current
-    ) {
-        // 根据类型分页查询
-        Page<Shop> page = shopService.query()
-                .like(StrUtil.isNotBlank(name), "name", name)
-                .page(new Page<>(current, SystemConstants.MAX_PAGE_SIZE));
-        // 返回数据
-        return Result.ok(page.getRecords());
-    }
+  /**
+   * 根据商铺名称关键字分页查询商铺信息
+   *
+   * @param name 商铺名称关键字
+   * @param current 页码
+   * @return 商铺列表
+   */
+  @GetMapping("/of/name")
+  public Result queryShopByName(
+      @RequestParam(value = "name", required = false) String name,
+      @RequestParam(value = "current", defaultValue = "1") Integer current) {
+    return shopService.queryShopByName(name, current);
+  }
 }

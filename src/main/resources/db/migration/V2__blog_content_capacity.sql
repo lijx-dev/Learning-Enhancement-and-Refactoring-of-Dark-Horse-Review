@@ -1,0 +1,1 @@
+ALTER TABLE tb_blog MODIFY COLUMN content TEXT NOT NULL;

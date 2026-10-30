@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hmdp.mapper.VoucherOrderMapper">
+
+    <select id="countByOrderId" resultType="Long">
+        SELECT COUNT(*)
+        FROM tb_voucher_order
+        WHERE id=#{orderId}
+    </select>
+
+    <select id="countByVoucherId" resultType="Long">
+        SELECT COUNT(*)
+        FROM tb_voucher_order
+        WHERE voucher_id=#{voucherId}
+    </select>
+
+    <select id="selectExpiredOrdinaryOrders" resultType="Long">
+        SELECT id
+        FROM tb_voucher_order
+        WHERE status=1 AND voucher_type_snapshot=0 AND expire_at&lt;=NOW(3)
+        ORDER BY expire_at,id LIMIT 200
+    </select>
+
+    <update id="initializeDeadline">
+        UPDATE tb_voucher_order
+        SET expire_at=TIMESTAMPADD(MINUTE,#{timeoutMinutes},NOW(3))
+        WHERE id=#{orderId} AND status=1 AND voucher_type_snapshot=0 AND expire_at IS NULL
+    </update>
+
+    <select id="selectDeadline" resultType="map">
+        SELECT user_id,status,expire_at
+        FROM tb_voucher_order
+        WHERE id=#{orderId}
+    </select>
+
+    <select id="selectExpiryStateForUpdate" resultType="map">
+        SELECT user_id,status+0 AS status,voucher_type_snapshot,expire_at,CAST(expire_at&lt;=NOW(3) AS SIGNED) AS due
+        FROM tb_voucher_order
+        WHERE id=#{orderId} FOR UPDATE
+    </select>
+
+    <update id="closeExpiredOrder">
+        UPDATE tb_voucher_order
+        SET status=4
+        WHERE id=#{orderId} AND status=1 AND expire_at&lt;=NOW(3)
+    </update>
+
+    <insert id="insertOrdinarySlot">
+        INSERT IGNORE INTO tb_ordinary_order_slot(user_id,voucher_id)
+        VALUES(#{userId},#{voucherId})
+    </insert>
+
+    <select id="lockOrdinarySlot" resultType="map">
+        SELECT user_id
+        FROM tb_ordinary_order_slot
+        WHERE user_id=#{userId} AND voucher_id=#{voucherId} FOR UPDATE
+    </select>
+
+    <insert id="insertEventHistory">
+        INSERT IGNORE INTO tb_order_event_history(event_id,order_id,event_type,occurred_at)
+        VALUES(#{eventId},#{orderId},#{eventType},#{occurredAt})
+    </insert>
+
+    <select id="selectBehaviorSnapshot" resultType="map">
+        SELECT shop_id_snapshot,user_id
+        FROM tb_voucher_order
+        WHERE id=#{orderId}
+    </select>
+</mapper>

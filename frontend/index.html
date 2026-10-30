@@ -1,0 +1,1098 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#ff6633" />
+    <meta
+      name="description"
+      content="在黑马点评发现杭州好店、探店笔记和超值优惠，把日常过得有滋有味。"
+    />
+    <title>发现身边的好去处 · 黑马点评</title>
+    <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/assets/icons.css" />
+    <link rel="stylesheet" href="/assets/style.css" />
+    <link rel="stylesheet" href="/assets/pages.css" />
+    <link rel="stylesheet" href="/assets/feedback.css" />
+    <link rel="stylesheet" href="/assets/experience.css" />
+    <link rel="preload" href="/assets/hangzhou-terrace.png" as="image" />
+    <script defer src="/vendor/vue.js"></script>
+    <script type="module" src="/scripts/app.js"></script>
+  </head>
+  <body>
+    <noscript>请启用 JavaScript，查看店铺和探店内容。</noscript>
+    <div id="app" v-cloak>
+      <a class="skip-link" href="#main">跳到主要内容</a>
+      <header class="site-header">
+        <div class="header-inner">
+          <a class="brand" href="/" aria-label="黑马点评首页"
+            ><i class="el-icon-location" aria-hidden="true"></i
+            ><span>黑马点评</span></a
+          >
+          <span class="city"
+            ><i class="el-icon-location-outline" aria-hidden="true"></i
+            >杭州</span
+          >
+          <nav class="main-nav" aria-label="主导航">
+            <a href="/" :class="{ active: activeNav === 'home' }">发现</a>
+            <a href="/shop-list.html" :class="{ active: activeNav === 'shops' }"
+              >好店</a
+            >
+            <a
+              href="/vouchers.html"
+              :class="{ active: activeNav === 'vouchers' }"
+              >优惠券</a
+            >
+          </nav>
+          <a
+            class="experience-nav"
+            href="/experience.html"
+            :class="{ active: page === 'experience' }"
+            >体验验证</a
+          >
+          <form class="header-search" role="search" @submit.prevent="search">
+            <i class="el-icon-search" aria-hidden="true"></i>
+            <input
+              v-model="keyword"
+              maxlength="50"
+              aria-label="搜索商家"
+              placeholder="搜索商家，发现你的下一站"
+            />
+            <button type="submit" aria-label="搜索">
+              <i class="el-icon-right" aria-hidden="true"></i>
+            </button>
+          </form>
+          <a class="button outline publish-link" href="/blog-edit.html"
+            ><i class="el-icon-edit-outline" aria-hidden="true"></i>发布笔记</a
+          >
+          <a
+            v-if="user"
+            class="account-link"
+            href="/info.html"
+            :aria-label="'个人主页：' + user.nickName"
+            ><app-image
+              :src="user.icon || '/imgs/icons/default-icon.png'"
+              alt=""
+            ></app-image
+          ></a>
+          <a v-else class="login-link" href="/login.html">登录 / 注册</a>
+        </div>
+      </header>
+
+      <main id="main" class="page-shell">
+        <experience-page
+          v-if="page === 'experience'"
+          :api="experienceApi"
+          :user="user"
+        ></experience-page>
+        <template v-else-if="page === 'home'">
+          <section class="hero" aria-labelledby="hero-title">
+            <img
+              class="hero-photo"
+              src="/assets/hangzhou-terrace.png"
+              alt="湖畔咖啡露台的城市生活氛围图"
+              fetchpriority="high"
+            />
+            <div class="hero-copy">
+              <span class="eyebrow"
+                ><span class="small-dot"></span>杭州 · 城市探索</span
+              >
+              <h1 id="hero-title">发现身边的好去处</h1>
+              <p>从一顿好饭，到一个愉快的周末。</p>
+              <a class="button primary" href="/shop-list.html"
+                >开始探索<i class="el-icon-right" aria-hidden="true"></i
+              ></a>
+            </div>
+            <div class="hero-note">
+              在杭州<br />遇见日常的美好<span>HANGZHOU, EVERYDAY</span>
+            </div>
+          </section>
+          <nav class="category-strip" aria-label="店铺分类">
+            <a
+              v-for="type in types"
+              :key="type.id"
+              :href="'/shop-list.html?type=' + type.id + '&name=' + encodeURIComponent(type.name)"
+            >
+              <span class="category-icon"
+                ><i
+                  :class="'el-icon-' + typeIcon(type.id)"
+                  aria-hidden="true"
+                ></i></span
+              ><span>{{ type.name }}</span>
+            </a>
+          </nav>
+          <div class="home-columns">
+            <section class="feed-section" aria-labelledby="feed-title">
+              <div class="section-heading">
+                <h2 id="feed-title">
+                  达人探店<span class="heading-dot"></span>
+                </h2>
+                <div class="tabs" aria-label="笔记来源">
+                  <button
+                    :class="{ active: feed === 'hot' }"
+                    @click="changeFeed('hot')"
+                  >
+                    热门推荐</button
+                  ><button
+                    :class="{ active: feed === 'follow' }"
+                    @click="changeFeed('follow')"
+                  >
+                    关注动态
+                  </button>
+                </div>
+                <span class="section-caption">记录每一次小确幸</span>
+              </div>
+              <div v-if="pageError" class="error-state" role="alert">
+                <i class="el-icon-warning-outline" aria-hidden="true"></i>{{
+                pageError }}<button class="text-button" @click="reload">
+                  重新加载
+                </button>
+              </div>
+              <div v-if="loading && !blogs.length" class="blog-grid">
+                <div v-for="n in 6" :key="n" class="skeleton-card">
+                  <div></div>
+                  <span></span><span></span>
+                </div>
+              </div>
+              <div v-else class="blog-grid">
+                <blog-card
+                  v-for="blog in blogs"
+                  :key="blog.id"
+                  :blog="blog"
+                  @like="like"
+                ></blog-card>
+              </div>
+              <div
+                v-if="!loading && !blogs.length && !pageError"
+                class="empty-state"
+              >
+                <i class="el-icon-camera" aria-hidden="true"></i>
+                <h3>
+                  {{ feed === 'follow' ? '关注的故事，还在路上' :
+                  '好故事，等你来记录' }}
+                </h3>
+                <p>
+                  {{ feed === 'follow' ?
+                  '去热门推荐里发现喜欢的作者，关注后在这里查看新笔记。' :
+                  '分享一次难忘的探店，让更多人发现这份美好。' }}
+                </p>
+                <a
+                  class="button outline"
+                  :href="feed === 'follow' ? '/?feed=hot' : '/blog-edit.html'"
+                  >{{ feed === 'follow' ? '发现作者' : '写下第一篇笔记' }}</a
+                >
+              </div>
+              <div v-if="blogs.length" class="load-more">
+                <button
+                  v-if="blogHasMore"
+                  class="button soft"
+                  :disabled="blogLoading"
+                  @click="loadBlogs()"
+                >
+                  {{ blogLoading ? '正在加载…' : '再发现一些' }}<i
+                    class="el-icon-arrow-down"
+                    aria-hidden="true"
+                  ></i></button
+                ><span v-else>暂时就到这里，出去走走吧。</span>
+              </div>
+            </section>
+            <aside class="home-aside">
+              <section class="panel good-shops">
+                <div class="panel-heading">
+                  <h2>精选好店</h2>
+                  <a href="/shop-list.html"
+                    >更多<i class="el-icon-arrow-right" aria-hidden="true"></i
+                  ></a>
+                </div>
+                <p class="panel-subtitle">从好口碑出发，找到下一站</p>
+                <a
+                  v-for="shop in homeShops"
+                  :key="shop.id"
+                  class="mini-shop"
+                  :href="'/shop-detail.html?id=' + shop.id"
+                  ><app-image
+                    :src="images(shop.images)[0]"
+                    :alt="shop.name"
+                  ></app-image>
+                  <div>
+                    <h3>{{ shop.name }}</h3>
+                    <div class="mini-rating">
+                      <rating-stars :score="shop.score"></rating-stars>
+                      <strong
+                        >{{ shop.score == null ? '暂无评分' : (shop.score /
+                        10).toFixed(1) }}</strong
+                      >
+                    </div>
+                    <p>{{ typeName(shop.typeId) }} · {{ shop.area }}</p>
+                  </div></a
+                >
+                <p v-if="asideError" class="muted">{{ asideError }}</p>
+              </section>
+              <section class="deal-panel">
+                <div class="panel-heading">
+                  <h2>
+                    <i class="el-icon-tickets" aria-hidden="true"></i>超值优惠
+                  </h2>
+                  <a href="/vouchers.html"
+                    >更多<i class="el-icon-arrow-right" aria-hidden="true"></i
+                  ></a>
+                </div>
+                <template v-if="homeOffer"
+                  ><p class="deal-title">{{ homeOffer.title }}</p>
+                  <p class="muted">{{ homeOffer.subTitle }}</p>
+                  <div class="deal-bottom">
+                    <div class="deal-price">
+                      ¥<strong>{{ money(homeOffer.payValue) }}</strong
+                      ><span>¥{{ money(homeOffer.actualValue) }}</span>
+                    </div>
+                    <a
+                      class="button primary small"
+                      :href="'/shop-detail.html?id=' + homeOffer.shopId"
+                      >去看看</a
+                    >
+                  </div></template
+                >
+                <template v-else
+                  ><p class="deal-title">给下一次出门，多一点期待</p>
+                  <p class="muted">查看店铺当前可领取的优惠券。</p>
+                  <a class="text-button" href="/vouchers.html"
+                    >发现优惠<i class="el-icon-right" aria-hidden="true"></i></a
+                ></template>
+              </section>
+              <section class="city-note">
+                <span class="eyebrow">给生活留点空白</span>
+                <h3>好好吃饭，<br />慢慢发现。</h3>
+                <p>你的下一次惊喜，也许就在街角。</p>
+                <div class="city-note-line"></div>
+                <span>杭州 / 每一天都值得记录</span>
+              </section>
+            </aside>
+          </div>
+        </template>
+
+        <template v-else-if="page === 'shops'">
+          <div class="page-intro">
+            <div>
+              <span class="eyebrow">HANGZHOU · 好店发现</span>
+              <h1>
+                {{ keyword ? '关于“' + keyword + '”的好店' : currentType ?
+                currentType.name + '，总有新发现' : '下一站，去一家好店' }}
+              </h1>
+              <p>从好口碑到好价格，找到合你心意的地方。</p>
+            </div>
+            <span class="result-count"
+              >找到 <strong>{{ catalogTotal }}</strong> 家店铺</span
+            >
+          </div>
+          <section class="filter-panel">
+            <div class="filter-categories">
+              <span class="filter-label">分类</span
+              ><button
+                :class="{ active: !catalogType }"
+                @click="catalogType = ''; loadCatalog(true)"
+              >
+                全部</button
+              ><button
+                v-for="type in types"
+                :key="type.id"
+                :class="{ active: String(type.id) === String(catalogType) }"
+                @click="catalogType = String(type.id); loadCatalog(true)"
+              >
+                {{ type.name }}
+              </button>
+            </div>
+            <div class="filter-sort">
+              <span class="filter-label">排序</span
+              ><button
+                :class="{ active: catalogSort === 'score' }"
+                @click="catalogSort = 'score'; loadCatalog(true)"
+              >
+                评分优先</button
+              ><button
+                :class="{ active: catalogSort === 'price' }"
+                @click="catalogSort = 'price'; loadCatalog(true)"
+              >
+                价格从低到高</button
+              ><a v-if="keyword" class="text-button" href="/shop-list.html"
+                >清除搜索<i class="el-icon-close" aria-hidden="true"></i
+              ></a>
+            </div>
+          </section>
+          <div v-if="pageError" class="error-state" role="alert">
+            {{ pageError }}<button
+              class="text-button"
+              @click="loadCatalog(true)"
+            >
+              重新加载
+            </button>
+          </div>
+          <div class="shop-grid">
+            <shop-card
+              v-for="shop in shops"
+              :key="shop.id"
+              :shop="shop"
+              :type-name="typeName(shop.typeId)"
+            ></shop-card
+            ><template v-if="catalogLoading"
+              ><div v-for="n in 3" :key="'skeleton-' + n" class="skeleton-card">
+                <div></div>
+                <span></span><span></span></div
+            ></template>
+          </div>
+          <div
+            v-if="!catalogLoading && !shops.length && !pageError"
+            class="empty-state"
+          >
+            <i class="el-icon-search" aria-hidden="true"></i>
+            <h3>暂时没有找到合适的店铺</h3>
+            <p>试试其他关键词，或换个分类再看看。</p>
+            <a href="/shop-list.html" class="button outline">查看全部好店</a>
+          </div>
+          <div v-if="shops.length" class="load-more">
+            <button
+              v-if="catalogHasMore"
+              class="button soft"
+              :disabled="catalogLoading"
+              @click="loadCatalog()"
+            >
+              {{ catalogLoading ? '正在加载…' : '加载更多好店' }}</button
+            ><span v-else>已经看完所有结果</span>
+          </div>
+        </template>
+
+        <template v-else-if="page === 'shop' && shop">
+          <div class="breadcrumbs">
+            <a href="/">首页</a
+            ><i class="el-icon-arrow-right" aria-hidden="true"></i
+            ><a :href="'/shop-list.html?type=' + shop.typeId"
+              >{{ typeName(shop.typeId) }}</a
+            ><i class="el-icon-arrow-right" aria-hidden="true"></i
+            ><span>{{ shop.name }}</span>
+          </div>
+          <section class="shop-detail-heading">
+            <div>
+              <span class="eyebrow"
+                >{{ shop.area }} · {{ typeName(shop.typeId) }}</span
+              >
+              <h1>{{ shop.name }}</h1>
+              <div class="detail-rating">
+                <rating-stars :score="shop.score"></rating-stars
+                ><strong
+                  >{{ shop.score == null ? '暂无评分' : (shop.score /
+                  10).toFixed(1) }}</strong
+                ><span>{{ shop.comments || 0 }} 条评价</span
+                ><span class="rating-divider"></span
+                ><span
+                  >人均
+                  <b
+                    >¥{{ shop.avgPrice == null ? '—' : shop.avgPrice }}</b
+                  ></span
+                >
+              </div>
+            </div>
+            <a class="button outline" :href="'/blog-edit.html?shop=' + shop.id"
+              ><i class="el-icon-edit-outline" aria-hidden="true"></i
+              >写篇探店笔记</a
+            >
+          </section>
+          <div class="shop-gallery">
+            <app-image
+              :src="shopPictures[0]"
+              :alt="shop.name"
+              eager="true"
+            ></app-image>
+            <div v-if="shopPictures.length > 1" class="gallery-secondary">
+              <app-image
+                v-for="(picture, index) in shopPictures.slice(1, 3)"
+                :key="index"
+                :src="picture"
+                :alt="shop.name + '店铺照片'"
+              ></app-image>
+            </div>
+          </div>
+          <div class="detail-columns">
+            <div class="detail-main">
+              <section class="panel shop-information">
+                <h2>店铺信息</h2>
+                <div>
+                  <i class="el-icon-location-outline" aria-hidden="true"></i
+                  ><span
+                    ><b>店铺地址</b>{{ shop.address || '地址暂未登记' }}</span
+                  >
+                </div>
+                <div>
+                  <i class="el-icon-time" aria-hidden="true"></i
+                  ><span
+                    ><b>营业时间</b>{{ shop.openHours || '营业时间暂未登记'
+                    }}</span
+                  >
+                </div>
+              </section>
+              <section class="detail-section">
+                <div class="section-heading">
+                  <h2>店铺优惠券</h2>
+                  <span class="section-caption">好价格，也要好体验</span>
+                </div>
+                <voucher-card
+                  v-for="voucher in vouchers"
+                  :key="voucher.id"
+                  :voucher="voucher"
+                  :busy="claimBusy === String(voucher.id)"
+                  @claim="claim"
+                ></voucher-card>
+                <div v-if="!vouchers.length" class="inline-empty">
+                  这家店铺暂时没有上架优惠券。
+                </div>
+              </section>
+              <section class="detail-section">
+                <div class="section-heading">
+                  <h2>大家的探店记录</h2>
+                  <a
+                    class="text-button"
+                    :href="'/blog-edit.html?shop=' + shop.id"
+                    >我也来记录<i class="el-icon-right" aria-hidden="true"></i
+                  ></a>
+                </div>
+                <div class="blog-grid">
+                  <blog-card
+                    v-for="blog in shopBlogs"
+                    :key="blog.id"
+                    :blog="blog"
+                    @like="like"
+                  ></blog-card>
+                </div>
+                <div v-if="!shopBlogs.length" class="inline-empty">
+                  暂时没有探店记录，你可以写下第一篇。
+                </div>
+              </section>
+            </div>
+            <aside>
+              <section class="panel detail-tip">
+                <span class="eyebrow">出门前的小提醒</span>
+                <h3>好好吃饭，<br />也好好计划。</h3>
+                <p>
+                  营业时间由店铺登记。出发前建议确认营业安排，使用优惠券前查看使用规则。
+                </p>
+                <a href="/shop-list.html" class="text-button"
+                  >再看看其他好店<i class="el-icon-right" aria-hidden="true"></i
+                ></a>
+              </section>
+            </aside>
+          </div>
+        </template>
+
+        <template v-else-if="page === 'blog' && blog">
+          <div class="breadcrumbs">
+            <a href="/">发现</a
+            ><i class="el-icon-arrow-right" aria-hidden="true"></i
+            ><span>探店笔记</span>
+          </div>
+          <article class="note-layout">
+            <div class="note-gallery">
+              <app-image
+                :src="blogPictures[galleryIndex]"
+                :alt="blog.title"
+                eager="true"
+              ></app-image>
+              <div v-if="blogPictures.length > 1" class="note-thumbnails">
+                <button
+                  v-for="(picture, index) in blogPictures"
+                  :key="index"
+                  :class="{ active: galleryIndex === index }"
+                  :aria-label="'查看第 ' + (index + 1) + ' 张照片'"
+                  @click="galleryIndex = index"
+                >
+                  <app-image :src="picture" alt=""></app-image>
+                </button>
+              </div>
+            </div>
+            <div class="note-body">
+              <div class="note-author">
+                <a class="author" :href="'/other-info.html?id=' + blog.userId"
+                  ><app-image
+                    :src="blog.icon || '/imgs/icons/default-icon.png'"
+                    alt=""
+                  ></app-image>
+                  <div>
+                    <strong>{{ blog.name || '探店记录员' }}</strong
+                    ><span>{{ date(blog.createTime) }} · 探店记录</span>
+                  </div></a
+                ><button
+                  v-if="!user || String(user.id) !== String(blog.userId)"
+                  class="button outline small"
+                  :disabled="followingBusy"
+                  @click="toggleFollow"
+                >
+                  {{ following ? '已关注' : '+ 关注' }}
+                </button>
+              </div>
+              <h1>{{ blog.title }}</h1>
+              <p class="note-content">{{ blog.content }}</p>
+              <a
+                v-if="blogShop"
+                class="note-shop"
+                :href="'/shop-detail.html?id=' + blogShop.id"
+                ><i class="el-icon-location-outline" aria-hidden="true"></i>
+                <div>
+                  <strong>{{ blogShop.name }}</strong
+                  ><span>{{ blogShop.area }} · {{ blogShop.address }}</span>
+                </div>
+                <i class="el-icon-arrow-right" aria-hidden="true"></i
+              ></a>
+              <div class="note-actions">
+                <button
+                  class="button"
+                  :class="blog.isLike ? 'primary' : 'outline'"
+                  :disabled="blog.busy"
+                  :aria-pressed="!!blog.isLike"
+                  @click="like(blog)"
+                >
+                  <i class="el-icon-star-off" aria-hidden="true"></i>{{
+                  blog.isLike ? '已点赞' : '喜欢这篇笔记' }} · {{ blog.liked ||
+                  0 }}</button
+                ><a class="text-button" href="/"
+                  >继续发现<i class="el-icon-right" aria-hidden="true"></i
+                ></a>
+              </div>
+            </div>
+          </article>
+        </template>
+
+        <template v-else-if="page === 'vouchers'">
+          <div class="page-intro">
+            <div>
+              <span class="eyebrow">GOOD DEALS · 超值优惠</span>
+              <h1>把好日子，过得更划算</h1>
+              <p>探索店铺当前上架的优惠券，具体规则以店铺说明为准。</p>
+            </div>
+            <i class="el-icon-tickets intro-icon" aria-hidden="true"></i>
+          </div>
+          <div class="voucher-grid">
+            <voucher-card
+              v-for="voucher in offers"
+              :key="voucher.id"
+              :voucher="voucher"
+              :shop-name="voucher.shopName"
+              :busy="claimBusy === String(voucher.id)"
+              @claim="claim"
+            ></voucher-card>
+          </div>
+          <div v-if="offerLoading" class="inline-empty">
+            <span class="spinner"></span>正在发现店铺优惠…
+          </div>
+          <div v-else-if="!offers.length && !pageError" class="empty-state">
+            <i class="el-icon-tickets" aria-hidden="true"></i>
+            <h3>好优惠，值得再等等</h3>
+            <p>暂时没有可领取的优惠券，先去发现喜欢的店铺吧。</p>
+            <a class="button outline" href="/shop-list.html">发现好店</a>
+          </div>
+          <div v-if="offerHasMore && !loading" class="load-more">
+            <button
+              class="button soft"
+              :disabled="offerLoading"
+              @click="loadOffers"
+            >
+              发现更多优惠
+            </button>
+          </div>
+        </template>
+
+        <template v-else-if="page === 'login'">
+          <div class="login-layout">
+            <section class="login-visual">
+              <img
+                src="/assets/hangzhou-terrace.png"
+                alt="杭州湖畔生活氛围图"
+              />
+              <div>
+                <span class="eyebrow">每一天，都值得记录</span>
+                <h1>好生活，<br />从一次发现开始。</h1>
+                <p>登录黑马点评，收藏你的喜欢，<br />分享你的探店故事。</p>
+              </div>
+            </section>
+            <section class="login-panel">
+              <span class="eyebrow">很高兴，又见到你</span>
+              <h2>欢迎来到黑马点评</h2>
+              <p class="muted">使用手机号与验证码登录</p>
+              <form @submit.prevent="login">
+                <label for="phone">手机号码</label>
+                <div class="input-with-prefix">
+                  <span>+86</span
+                  ><input
+                    id="phone"
+                    v-model="phone"
+                    type="tel"
+                    maxlength="11"
+                    autocomplete="tel-national"
+                    placeholder="请输入手机号码"
+                    required
+                  />
+                </div>
+                <label for="code">验证码</label>
+                <div class="code-input">
+                  <input
+                    id="code"
+                    v-model="code"
+                    inputmode="numeric"
+                    maxlength="6"
+                    autocomplete="one-time-code"
+                    placeholder="6 位验证码"
+                    required
+                  /><button
+                    class="text-button"
+                    type="button"
+                    :disabled="codeBusy || codeCountdown > 0"
+                    @click="sendCode"
+                  >
+                    {{ codeBusy ? '正在获取…' : codeCountdown ? codeCountdown +
+                    ' 秒后重试' : '获取验证码' }}
+                  </button>
+                </div>
+                <p v-if="loginError" class="form-error" role="alert">
+                  {{ loginError }}
+                </p>
+                <button
+                  class="button primary full-width"
+                  :disabled="loginBusy"
+                  type="submit"
+                >
+                  {{ loginBusy ? '正在登录…' : '登录，开始发现' }}<i
+                    class="el-icon-right"
+                    aria-hidden="true"
+                  ></i>
+                </button>
+              </form>
+              <p class="login-hint">
+                当前为本地演示环境，验证码请从点评服务日志获取。
+              </p>
+              <a class="text-button" href="/"
+                >先逛逛<i class="el-icon-right" aria-hidden="true"></i
+              ></a>
+            </section>
+          </div>
+        </template>
+
+        <template v-else-if="page === 'profile' && profileUser">
+          <section class="profile-banner">
+            <div class="profile-identity">
+              <app-image
+                :src="profileUser.icon || '/imgs/icons/default-icon.png'"
+                alt=""
+              ></app-image>
+              <div>
+                <span class="eyebrow">每一次出门，都有值得记录的故事</span>
+                <h1>{{ profileName }}</h1>
+                <p>在这里，留下你的城市生活。</p>
+              </div>
+            </div>
+            <div v-if="isOwnProfile" class="profile-tools">
+              <p>连续签到 <strong>{{ signCount }}</strong> 天</p>
+              <button
+                class="button primary"
+                :disabled="signBusy || signed"
+                @click="sign"
+              >
+                {{ signed ? '今天已签到' : signBusy ? '正在签到…' : '今日签到'
+                }}
+              </button>
+            </div>
+          </section>
+          <div v-if="isOwnProfile" class="profile-navigation">
+            <a href="/orders.html"
+              ><i class="el-icon-tickets" aria-hidden="true"></i>
+              <div>
+                <h3>我的订单</h3>
+                <p>查看优惠券与领取结果</p>
+              </div>
+              <i class="el-icon-arrow-right" aria-hidden="true"></i></a
+            ><a href="/blog-edit.html"
+              ><i class="el-icon-edit-outline" aria-hidden="true"></i>
+              <div>
+                <h3>发布新笔记</h3>
+                <p>分享今天的好发现</p>
+              </div>
+              <i class="el-icon-arrow-right" aria-hidden="true"></i></a
+            ><button @click="logout">
+              <i class="el-icon-switch-button" aria-hidden="true"></i
+              ><span>退出登录</span>
+            </button>
+          </div>
+          <div class="section-heading profile-section-heading">
+            <h2>{{ isOwnProfile ? '我的探店记录' : 'TA 的探店记录' }}</h2>
+            <span class="section-caption">把小日子，写成好故事</span>
+          </div>
+          <div class="profile-blog-grid">
+            <blog-card
+              v-for="blog in blogs"
+              :key="blog.id"
+              :blog="blog"
+              @like="like"
+            ></blog-card>
+          </div>
+          <div
+            v-if="!loading && !blogs.length && !pageError"
+            class="empty-state"
+          >
+            <i class="el-icon-notebook-2" aria-hidden="true"></i>
+            <h3>这里还没有探店记录</h3>
+            <a v-if="isOwnProfile" href="/blog-edit.html" class="button outline"
+              >写下第一篇</a
+            >
+          </div>
+          <div v-if="blogs.length && blogHasMore" class="load-more">
+            <button
+              class="button soft"
+              :disabled="blogLoading"
+              @click="loadBlogs()"
+            >
+              {{ blogLoading ? '正在加载…' : '更多笔记' }}
+            </button>
+          </div>
+        </template>
+
+        <template v-else-if="page === 'orders'">
+          <div class="page-intro">
+            <div>
+              <span class="eyebrow">MY ORDERS · 我的订单</span>
+              <h1>下一次出门，已经有了期待</h1>
+              <p>查看你的优惠券订单与领取状态。</p>
+            </div>
+            <button
+              class="button outline"
+              :disabled="orderLoading"
+              @click="loadOrders"
+            >
+              刷新订单<i class="el-icon-refresh" aria-hidden="true"></i>
+            </button>
+          </div>
+          <div v-if="requestMessage" class="request-banner" role="status">
+            <i class="el-icon-info" aria-hidden="true"></i>{{ requestMessage }}
+          </div>
+          <div v-if="orderError" class="error-state" role="alert">
+            {{ orderError }}<button class="text-button" @click="loadOrders">
+              重试
+            </button>
+          </div>
+          <section class="order-list">
+            <article
+              v-for="order in orders"
+              :key="order.order_id"
+              class="order-card"
+            >
+              <div class="order-top">
+                <span>订单编号 {{ order.order_id }}</span
+                ><span>{{ date(order.created_at) }}</span>
+              </div>
+              <div class="order-main">
+                <span class="order-ticket"
+                  ><i class="el-icon-tickets" aria-hidden="true"></i
+                ></span>
+                <div class="order-info">
+                  <h3>{{ order.title || '店铺优惠券' }}</h3>
+                  <p class="muted">
+                    {{ order.voucher_type ? '限时优惠券' : '店铺代金券' }}
+                  </p>
+                  <a
+                    v-if="order.shop_id"
+                    class="text-button"
+                    :href="'/shop-detail.html?id=' + order.shop_id"
+                    >查看店铺<i class="el-icon-right" aria-hidden="true"></i
+                  ></a>
+                </div>
+                <div class="order-price">¥{{ money(order.pay_cents) }}</div>
+                <span class="order-state" :class="'state-' + order.status"
+                  >{{ orderStatus(order.status) }}</span
+                ><button
+                  v-if="order.status === 1 && order.voucher_type === 0"
+                  class="button outline small"
+                  @click="cancelOrder(order)"
+                >
+                  取消订单
+                </button>
+              </div>
+              <p v-if="order.status === 1" class="order-notice">
+                待付款订单将在超时后自动关闭。当前页面未接入在线支付。
+              </p>
+            </article>
+          </section>
+          <div
+            v-if="!orderLoading && !orders.length && !orderError"
+            class="empty-state"
+          >
+            <i class="el-icon-tickets" aria-hidden="true"></i>
+            <h3>还没有优惠券订单</h3>
+            <p>去发现好店，给下一次出门多一点期待。</p>
+            <a class="button primary" href="/vouchers.html">发现优惠券</a>
+          </div>
+          <div class="pagination" v-if="orderTotal > 20">
+            <button
+              class="button soft"
+              :disabled="orderPage === 1 || orderLoading"
+              @click="orderPageTo(orderPage - 1)"
+            >
+              上一页</button
+            ><span>第 {{ orderPage }} 页</span
+            ><button
+              class="button soft"
+              :disabled="orderPage * 20 >= orderTotal || orderLoading"
+              @click="orderPageTo(orderPage + 1)"
+            >
+              下一页
+            </button>
+          </div>
+        </template>
+
+        <template v-else-if="page === 'publish' && user">
+          <div class="page-intro">
+            <div>
+              <span class="eyebrow">YOUR CITY STORIES · 探店记录</span>
+              <h1>今天，有什么值得分享？</h1>
+              <p>一张照片，一段记录，让更多人发现你的好去处。</p>
+            </div>
+          </div>
+          <div class="publish-layout">
+            <form class="panel publish-form" @submit.prevent="saveBlog">
+              <label for="note-title">给这次探店起个标题</label
+              ><input
+                id="note-title"
+                v-model="draft.title"
+                maxlength="255"
+                placeholder="例如：藏在街角的宝藏咖啡馆"
+                required
+              />
+              <div class="field-label">
+                <label for="note-content">写下你的探店感受</label
+                ><span>{{ draft.content.length }} / 10000</span>
+              </div>
+              <textarea
+                id="note-content"
+                v-model="draft.content"
+                maxlength="10000"
+                rows="10"
+                placeholder="环境、菜品、体验……那些让你喜欢的小细节，都值得被记录。"
+                required
+              ></textarea>
+              <div class="field-label">
+                <label for="note-images">上传探店照片</label
+                ><span>{{ draft.pictures.length }} / 9</span>
+              </div>
+              <div class="upload-grid">
+                <div
+                  v-for="picture in draft.pictures"
+                  :key="picture"
+                  class="upload-preview"
+                >
+                  <app-image
+                    :src="imagePath(picture)"
+                    alt="待发布的探店照片"
+                  ></app-image
+                  ><button
+                    type="button"
+                    aria-label="移除这张照片"
+                    :disabled="uploadBusy || publishBusy"
+                    @click="removePicture(picture)"
+                  >
+                    <i class="el-icon-close" aria-hidden="true"></i>
+                  </button>
+                </div>
+                <label
+                  v-if="draft.pictures.length < 9"
+                  for="note-images"
+                  class="upload-box"
+                  ><i
+                    :class="uploadBusy ? 'el-icon-loading' : 'el-icon-plus'"
+                    aria-hidden="true"
+                  ></i
+                  ><span>{{ uploadBusy ? '正在上传…' : '添加照片' }}</span
+                  ><input
+                    id="note-images"
+                    type="file"
+                    accept=".jpg,.jpeg,.png,.webp"
+                    multiple
+                    :disabled="uploadBusy || publishBusy"
+                    @change="upload"
+                /></label>
+              </div>
+              <p class="muted upload-help">
+                支持 JPG、PNG、WebP，每张不超过 5 MB，最多 9 张。
+              </p>
+              <label for="shop-query">关联你探访的店铺</label>
+              <div class="shop-picker-search">
+                <input
+                  id="shop-query"
+                  v-model="shopQuery"
+                  maxlength="50"
+                  placeholder="输入店铺名称，搜索后选择"
+                /><button
+                  type="button"
+                  class="button soft"
+                  :disabled="publishShopLoading"
+                  @click="loadPublishShops"
+                >
+                  搜索店铺
+                </button>
+              </div>
+              <select
+                id="note-shop"
+                v-model="draft.shopId"
+                required
+                aria-label="关联店铺"
+              >
+                <option disabled value="">请选择关联店铺</option>
+                <option
+                  v-for="shop in publishShops"
+                  :key="shop.id"
+                  :value="String(shop.id)"
+                >
+                  {{ shop.name }} · {{ shop.area }}
+                </option>
+              </select>
+              <p
+                v-if="!publishShopLoading && !publishShops.length"
+                class="muted"
+              >
+                没有找到匹配店铺，试试其他关键词。
+              </p>
+              <div class="publish-actions">
+                <span class="muted">分享真实体验，尊重每一份感受。</span
+                ><button
+                  type="submit"
+                  class="button primary"
+                  :disabled="publishBusy || uploadBusy"
+                >
+                  {{ publishBusy ? '正在发布…' : '发布笔记' }}<i
+                    class="el-icon-right"
+                    aria-hidden="true"
+                  ></i>
+                </button>
+              </div>
+            </form>
+            <aside class="panel writing-tip">
+              <i class="el-icon-edit-outline" aria-hidden="true"></i>
+              <h3>你的发现，<br />会成为别人的惊喜。</h3>
+              <p>清晰的照片、真实的体验、实用的地址，都是一篇好笔记的开始。</p>
+              <p>试着写下你最喜欢的一道菜，或那个让你想再来的瞬间。</p>
+            </aside>
+          </div>
+        </template>
+
+        <div
+          v-if="loading && !['home', 'login', 'shops', 'vouchers', 'experience'].includes(page)"
+          class="empty-state"
+          role="status"
+        >
+          <span class="spinner"></span>
+          <p>正在加载你的好发现…</p>
+        </div>
+        <div
+          v-if="pageError && page !== 'home' && page !== 'shops'"
+          class="empty-state error-state"
+          role="alert"
+        >
+          <h2>内容暂时无法加载</h2>
+          <p>{{ pageError }}</p>
+          <button class="button outline" @click="reload">重新加载</button>
+        </div>
+        <div v-if="page === 'not-found'" class="empty-state">
+          <h1>这条小路，暂时还没开放</h1>
+          <p>回到首页，继续发现杭州的好去处。</p>
+          <a href="/" class="button primary">返回首页</a>
+        </div>
+      </main>
+
+      <footer class="site-footer">
+        <a class="footer-brand" href="/"
+          >黑马点评<span>把日常，过得有滋有味。</span></a
+        >
+        <div>
+          <a href="/shop-list.html">发现好店</a><span>·</span
+          ><a href="/vouchers.html">超值优惠</a><span>·</span
+          ><a href="/blog-edit.html">记录生活</a>
+        </div>
+        <span>杭州 · 每一天都值得发现</span>
+      </footer>
+      <transition name="toast"
+        ><div
+          v-if="toast"
+          class="toast-message"
+          :class="toast.kind"
+          role="status"
+        >
+          <i
+            :class="toast.kind === 'error' ? 'el-icon-warning-outline' : 'el-icon-circle-check'"
+            aria-hidden="true"
+          ></i
+          >{{ toast.message }}<button
+            class="icon-button"
+            aria-label="关闭提示"
+            @click="toast = null"
+          >
+            <i class="el-icon-close" aria-hidden="true"></i>
+          </button></div
+      ></transition>
+      <div
+        v-if="dialog"
+        class="dialog-overlay"
+        @click.self="dialog = null"
+        @keydown.esc="dialog = null"
+      >
+        <section
+          ref="dialogPanel"
+          @keydown.tab="trapDialog"
+          class="dialog"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="dialog-title"
+        >
+          <button
+            class="dialog-close icon-button"
+            aria-label="关闭"
+            @click="dialog = null"
+          >
+            <i class="el-icon-close" aria-hidden="true"></i></button
+          ><span class="dialog-icon"
+            ><i class="el-icon-tickets" aria-hidden="true"></i></span
+          ><template v-if="dialog.kind === 'claim'"
+            ><h2 id="dialog-title">
+              {{ Number(dialog.voucher.payValue) === 0 ? '确认领取优惠券' :
+              '确认创建优惠券订单' }}
+            </h2>
+            <p>{{ dialog.voucher.title }}</p>
+            <div class="dialog-price">
+              ¥{{ money(dialog.voucher.payValue) }}
+            </div>
+            <p class="dialog-rules">
+              {{ (dialog.voucher.rules ||
+              '具体使用规则以店铺说明为准').replace(/\\n/g, '\n') }}
+            </p>
+            <p class="muted">
+              {{ dialog.voucher.type ?
+              '提交后会确认领取结果，请在我的订单查看状态。' :
+              Number(dialog.voucher.payValue) === 0 ?
+              '领取后可在我的订单查看优惠券。' :
+              '确认后仅创建待付款订单，尚未支付。当前页面未接入在线支付。' }}
+            </p>
+            <div class="dialog-actions">
+              <button class="button soft" @click="dialog = null">再想想</button
+              ><button class="button primary" @click="confirmClaim">
+                确认{{ Number(dialog.voucher.payValue) === 0 ? '领取' :
+                '创建订单' }}
+              </button>
+            </div></template
+          ><template v-else
+            ><h2 id="dialog-title">确认取消这笔订单？</h2>
+            <p>{{ dialog.order.title }}</p>
+            <p class="muted">仅取消当前未付款的普通券订单。</p>
+            <div class="dialog-actions">
+              <button class="button soft" @click="dialog = null">
+                保留订单</button
+              ><button class="button primary" @click="confirmCancel">
+                确认取消
+              </button>
+            </div></template
+          >
+        </section>
+      </div>
+    </div>
+  </body>
+</html>

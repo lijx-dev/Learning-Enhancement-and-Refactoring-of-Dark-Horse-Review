@@ -1,0 +1,142 @@
+{
+  "verified_at_utc": "2026-10-11T05:50:13.487894+00:00",
+  "scope": "Alibaba Cloud lightweight deployment smoke through server-local Nginx",
+  "runtime": "eclipse-temurin:8-jre",
+  "server": "203.0.113.10",
+  "deployment_directory": "/opt/hmdp-cloud",
+  "passed": true,
+  "checks": [
+    "proxy health UP",
+    "desktop pages and local image assets HTTP 200",
+    "shop types, catalog and shop detail",
+    "cache experience returns two read traces",
+    "disabled Kafka, RocketMQ and CDC correctly reported",
+    "normal code login, current user, sign-in and sign count",
+    "anonymous identity denied and public ops/metrics blocked"
+  ],
+  "containers": [
+    {
+      "name": "hmdp-cloud-java-1",
+      "status": "running",
+      "restart_count": 0,
+      "oom_killed": false,
+      "health": null
+    },
+    {
+      "name": "hmdp-cloud-memcached-1",
+      "status": "running",
+      "restart_count": 0,
+      "oom_killed": false,
+      "health": null
+    },
+    {
+      "name": "hmdp-cloud-mysql-1",
+      "status": "running",
+      "restart_count": 0,
+      "oom_killed": false,
+      "health": "healthy"
+    },
+    {
+      "name": "hmdp-cloud-redis-1",
+      "status": "running",
+      "restart_count": 0,
+      "oom_killed": false,
+      "health": "healthy"
+    },
+    {
+      "name": "hmdp-cloud-web-1",
+      "status": "running",
+      "restart_count": 0,
+      "oom_killed": false,
+      "health": "healthy"
+    }
+  ],
+  "test_data": "Created demo phone 18800001234 via normal login and signed in once; no admin rights configured.",
+  "public_access": {
+    "passed": true,
+    "base_url": "http://203.0.113.10:8080",
+    "checks": [
+      {
+        "path": "/",
+        "status": 200
+      },
+      {
+        "path": "/experience.html",
+        "status": 200
+      },
+      {
+        "path": "/vouchers.html",
+        "status": 200
+      },
+      {
+        "path": "/imgs/add.png",
+        "status": 200
+      },
+      {
+        "path": "/api/actuator/health",
+        "status": 200,
+        "health": "UP"
+      },
+      {
+        "path": "/api/shop-type/list",
+        "status": 200,
+        "success": true
+      },
+      {
+        "path": "/api/shop/catalog?page=1&size=12&sort=score",
+        "status": 200,
+        "success": true
+      },
+      {
+        "path": "/api/shop/1",
+        "status": 200,
+        "success": true
+      },
+      {
+        "path": "/api/experience/cache?shopId=1",
+        "status": 200,
+        "success": true,
+        "read_trace_count": 2
+      },
+      {
+        "path": "/api/experience/capabilities",
+        "status": 200,
+        "success": true,
+        "lightweight_flags_correct": true
+      },
+      {
+        "path": "/api/user/me",
+        "status": 401
+      },
+      {
+        "path": "/api/ops/outbox",
+        "status": 404
+      },
+      {
+        "path": "/api/actuator/prometheus",
+        "status": 404
+      }
+    ],
+    "verified_at": "2026-10-11T13:52:48.596310+08:00"
+  },
+  "limits": "No full business regression, voucher/order/payment test, MQ/CDC broker test, browser visual QA or load test.",
+  "firewall_fix": {
+    "cause": "firewalld rejected forwarding on the unassigned hmdp Docker bridge",
+    "bridge": "br-1d61cd629197",
+    "changes": [
+      "Added this project bridge to trusted zone in runtime and permanent config",
+      "Allowed public zone TCP 8080 in runtime and permanent config"
+    ],
+    "note": "No global firewall disable or reload; recheck bridge association if the Compose network is recreated."
+  },
+  "resource_snapshot": {
+    "java_container_mib": 277.9,
+    "mysql_container_mib": 142.3,
+    "redis_container_mib": 8.258,
+    "host_available_memory_mib_approx": 997,
+    "root_disk_available_gib_approx": 29,
+    "note": "Single idle deployment snapshot, not a capacity or load-test result."
+  },
+  "env_file_mode": "600",
+  "publication_note": "2026-10-30: personal paths and deployment host replaced with documentation examples; historical outcomes retained."
+}

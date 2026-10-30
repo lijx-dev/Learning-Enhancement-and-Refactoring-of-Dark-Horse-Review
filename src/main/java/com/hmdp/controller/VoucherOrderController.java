@@ -1,22 +1,19 @@
 package com.hmdp.controller;
 
-
 import com.hmdp.dto.Result;
+import com.hmdp.service.ISeckillService;
 import com.hmdp.service.IVoucherOrderService;
+import com.hmdp.utils.UserHolder;
+import javax.annotation.Resource;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestMapping;
-
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.annotation.Resource;
-
 /**
- * <p>
- *  前端控制器
- * </p>
+ * 前端控制器
  *
  * @author 虎哥
  */
@@ -24,46 +21,55 @@ import javax.annotation.Resource;
 @RequestMapping("/voucher-order")
 public class VoucherOrderController {
 
-    @Resource
-    private IVoucherOrderService voucherOrderService;
+  @Resource
+  private IVoucherOrderService voucherOrderService;
 
-    @GetMapping("mine")
-    public Result myOrders(@RequestParam(defaultValue = "1") Integer page) {
-        return voucherOrderService.queryMyOrders(page, false);
-    }
+  @Resource
+  private ISeckillService coordinator;
 
-    @GetMapping("mine/vouchers")
-    public Result myVouchers(@RequestParam(defaultValue = "1") Integer page) {
-        return voucherOrderService.queryMyOrders(page, true);
-    }
+  @GetMapping("requests/{id}")
+  public Result queryReservationStatus(@PathVariable("id") Long orderId) {
+    return coordinator.queryReservationStatus(orderId, UserHolder.getUser().getId());
+  }
 
-    @PostMapping("seckill/{id}")
-    public Result seckillVoucher(@PathVariable("id") Long voucherId) {
-        return voucherOrderService.seckillVoucher(voucherId);
-    }
+  @GetMapping("mine")
+  public Result myOrders(@RequestParam(defaultValue = "1") Integer page) {
+    return voucherOrderService.queryMyOrders(page, false);
+  }
 
-    @PostMapping("ordinary/{id}")
-    public Result orderOrdinaryVoucher(@PathVariable("id") Long voucherId) {
-        return voucherOrderService.orderOrdinaryVoucher(voucherId);
-    }
+  @GetMapping("mine/vouchers")
+  public Result myVouchers(@RequestParam(defaultValue = "1") Integer page) {
+    return voucherOrderService.queryMyOrders(page, true);
+  }
 
-    @PostMapping("{id}/pay/mock")
-    public Result payMockOrder(@PathVariable("id") Long orderId, @RequestParam Long expectedPayCents) {
-        return voucherOrderService.payMockOrder(orderId, expectedPayCents);
-    }
+  @PostMapping("seckill/{id}")
+  public Result seckillVoucher(@PathVariable("id") Long voucherId) {
+    return voucherOrderService.seckillVoucher(voucherId);
+  }
 
-    @GetMapping("{id}")
-    public Result queryMyOrder(@PathVariable("id") Long orderId) {
-        return voucherOrderService.queryMyOrder(orderId);
-    }
+  @PostMapping("ordinary/{id}")
+  public Result orderOrdinaryVoucher(@PathVariable("id") Long voucherId) {
+    return voucherOrderService.orderOrdinaryVoucher(voucherId);
+  }
 
-    @GetMapping("of/voucher/{id}")
-    public Result queryMyVoucherOrder(@PathVariable("id") Long voucherId) {
-        return voucherOrderService.queryMyVoucherOrder(voucherId);
-    }
+  @PostMapping("{id}/pay/mock")
+  public Result payMockOrder(
+      @PathVariable("id") Long orderId, @RequestParam Long expectedPayCents) {
+    return voucherOrderService.payMockOrder(orderId, expectedPayCents);
+  }
 
-    @PostMapping("{id}/cancel")
-    public Result cancelUnpaidOrdinaryOrder(@PathVariable("id") Long orderId) {
-        return voucherOrderService.cancelUnpaidOrdinaryOrder(orderId);
-    }
+  @GetMapping("{id}")
+  public Result queryMyOrder(@PathVariable("id") Long orderId) {
+    return voucherOrderService.queryMyOrder(orderId);
+  }
+
+  @GetMapping("of/voucher/{id}")
+  public Result queryMyVoucherOrder(@PathVariable("id") Long voucherId) {
+    return voucherOrderService.queryMyVoucherOrder(voucherId);
+  }
+
+  @PostMapping("{id}/cancel")
+  public Result cancelUnpaidOrdinaryOrder(@PathVariable("id") Long orderId) {
+    return voucherOrderService.cancelUnpaidOrdinaryOrder(orderId);
+  }
 }

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hmdp.mapper.MediaMapper">
+
+    <insert id="insertOwner">
+        INSERT INTO tb_media_owner(path,user_id)
+        VALUES(#{path},#{userId})
+    </insert>
+
+    <select id="selectOwnerForUpdate" resultType="map">
+        SELECT user_id,state
+        FROM tb_media_owner
+        WHERE path=#{path} FOR UPDATE
+    </select>
+
+    <insert id="insertBlogReference">
+        INSERT INTO tb_blog_media(blog_id,path)
+        VALUES(#{blogId},#{path})
+    </insert>
+
+    <select id="selectReferencesForUpdate" resultType="map">
+        SELECT blog_id
+        FROM tb_blog_media
+        WHERE path=#{path} LIMIT 1 FOR UPDATE
+    </select>
+
+    <update id="markDeleting">
+        UPDATE tb_media_owner
+        SET state='DELETING'
+        WHERE path=#{path}
+    </update>
+
+    <select id="selectOwnedStates" resultType="String">
+        SELECT state
+        FROM tb_media_owner
+        WHERE path=#{path} AND user_id=#{userId}
+    </select>
+
+    <update id="markDeleted">
+        UPDATE tb_media_owner
+        SET state='DELETED'
+        WHERE path=#{path} AND state='DELETING'
+    </update>
+</mapper>

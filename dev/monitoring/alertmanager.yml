@@ -1,0 +1,9 @@
+route:
+  receiver: local
+  group_by: [alertname]
+  group_wait: 10s
+  group_interval: 1m
+  repeat_interval: 4h
+receivers:
+  - name: local
+# Alerts are visible in the local UI. No email or external webhook is configured.

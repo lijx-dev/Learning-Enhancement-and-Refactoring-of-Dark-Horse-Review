@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hmdp.mapper.MessageMapper">
+
+    <select id="selectOrderProgress" resultType="map">
+        SELECT b.id AS event_id,b.kind,b.state,b.created_at,b.sent_at,
+               b.consumed_at,
+               (SELECT COUNT(*) FROM tb_message_inbox i WHERE i.event_id=b.id) AS inbox_count
+        FROM tb_business_outbox b
+        JOIN tb_voucher_order o ON o.id=b.aggregate_id AND o.user_id=#{userId}
+        WHERE b.aggregate_id=#{orderId}
+          AND b.kind IN ('ORDER_CREATED','ORDER_PAID','ORDER_CLOSED','ORDER_EXPIRE','SECKILL_FULFILL')
+        ORDER BY b.id LIMIT 30
+    </select>
+
+    <select id="selectFailures" resultType="map">
+        SELECT *
+        FROM tb_message_failure
+        ORDER BY created_at DESC LIMIT 100
+    </select>
+
+    <select id="countInboxEvent" resultType="Long">
+        SELECT COUNT(*)
+        FROM tb_message_inbox
+        WHERE consumer_group=#{consumerGroup} AND event_id=#{eventId}
+    </select>
+
+    <insert id="insertInboxEvent">
+        INSERT INTO tb_message_inbox(consumer_group,event_id)
+        VALUES(#{consumerGroup},#{eventId})
+    </insert>
+
+    <insert id="insertFailure">
+        INSERT IGNORE INTO tb_message_failure(consumer_group,event_key,event_id,broker_message_id,payload,reason)
+        VALUES(#{consumerGroup},#{eventKey},#{eventId},#{brokerMessageId},#{payload},#{reason})
+    </insert>
+</mapper>

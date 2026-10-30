@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hmdp.mapper.BusinessOutboxMapper">
+
+    <resultMap id="BusinessOutboxTaskMap" type="com.hmdp.entity.BusinessOutboxTask">
+        <result column="id" property="id"/>
+        <result column="kind" property="kind"/>
+        <result column="aggregate_id" property="aggregateId"/>
+        <result column="user_id" property="userId"/>
+        <result column="cursor_id" property="cursorId"/>
+        <result column="state" property="state"/>
+        <result column="attempts" property="attempts"/>
+        <result column="consume_attempts" property="consumeAttempts"/>
+        <result column="resource_path" property="resourcePath"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="deliver_at" property="deliverAt"/>
+    </resultMap>
+
+    <insert id="insertEvent">
+        INSERT INTO tb_business_outbox(kind,aggregate_id,user_id)
+        VALUES(#{kind},#{aggregateId},#{userId})
+    </insert>
+
+    <insert id="insertMediaDeletion">
+        INSERT INTO tb_business_outbox(kind,aggregate_id,user_id,resource_path)
+        VALUES('MEDIA_DELETE',#{aggregateId},#{userId},#{resourcePath})
+    </insert>
+
+    <insert id="insertDeadline">
+        INSERT INTO tb_business_outbox(kind,aggregate_id,user_id,deliver_at)
+        VALUES('ORDER_EXPIRE',#{orderId},#{userId},#{deadline})
+    </insert>
+
+    <select id="selectUnfinishedEvents" resultType="map">
+        SELECT *
+        FROM tb_business_outbox
+        WHERE state IN ('PENDING','SENDING','SENT','REVIEW')
+        ORDER BY id LIMIT 100
+    </select>
+
+    <select id="selectReviewEvent" resultMap="BusinessOutboxTaskMap">
+        SELECT kind,aggregate_id
+        FROM tb_business_outbox
+        WHERE id=#{eventId} AND state='REVIEW'
+    </select>
+
+    <update id="retryReviewEvent">
+        UPDATE tb_business_outbox
+        SET state='PENDING',attempts=0,consume_attempts=0,next_attempt_at=NOW(),lease_owner=NULL,lease_until=NULL,last_error=NULL
+        WHERE id=#{eventId} AND state='REVIEW'
+    </update>
+
+    <insert id="insertSeckillFulfillment">
+        INSERT IGNORE INTO tb_business_outbox(kind,aggregate_id,user_id,idempotency_key)
+        VALUES('SECKILL_FULFILL',#{orderId},#{userId},#{idempotencyKey})
+    </insert>
+
+    <update id="retryFulfillment">
+        UPDATE tb_business_outbox
+        SET state='PENDING',attempts=0,consume_attempts=0,next_attempt_at=NOW(),last_error=NULL
+        WHERE idempotency_key=#{idempotencyKey} AND state='REVIEW'
+    </update>
+
+    <insert id="insertSeckillRetry">
+        INSERT INTO tb_business_outbox(kind,aggregate_id)
+        VALUES('SECKILL_RETRY',#{orderId})
+    </insert>
+
+    <select id="selectEventForUpdate" resultMap="BusinessOutboxTaskMap">
+        SELECT *
+        FROM tb_business_outbox
+        WHERE id=#{eventId} FOR UPDATE
+    </select>
+
+    <select id="selectEventById" resultMap="BusinessOutboxTaskMap">
+        SELECT * FROM tb_business_outbox WHERE id=#{eventId}
+    </select>
+
+    <update id="markDuplicateDone">
+        UPDATE tb_business_outbox
+        SET state='DONE',lease_owner=NULL,lease_until=NULL
+        WHERE id=#{eventId}
+    </update>
+
+    <select id="selectCursor" resultType="Long">
+        SELECT cursor_id
+        FROM tb_business_outbox
+        WHERE id=#{eventId}
+    </select>
+
+    <insert id="insertFeedContinuation">
+        INSERT INTO tb_business_outbox(kind,aggregate_id,user_id,cursor_id,created_at)
+        VALUES(#{kind},#{aggregateId},#{userId},#{cursorId},#{createdAt})
+    </insert>
+
+    <update id="markConsumed">
+        UPDATE tb_business_outbox
+        SET state='DONE',consumed_at=NOW(3),lease_owner=NULL,lease_until=NULL,last_error=NULL
+        WHERE id=#{eventId}
+    </update>
+
+    <update id="recordConsumeFailure">
+        UPDATE tb_business_outbox
+        SET consume_attempts=consume_attempts+1,last_error=#{lastError}
+        WHERE id=#{eventId}
+    </update>
+
+    <update id="markReview">
+        UPDATE tb_business_outbox
+        SET state='REVIEW',lease_owner=NULL,lease_until=NULL
+        WHERE id=#{eventId} AND state&lt;&gt;'DONE'
+    </update>
+
+    <select id="selectClaimableEvents" resultMap="BusinessOutboxTaskMap">
+        SELECT *
+        FROM tb_business_outbox
+        WHERE (state='PENDING' AND next_attempt_at&lt;=NOW()) OR (state='SENDING' AND lease_until&lt;NOW(3))
+        ORDER BY id LIMIT #{limit} FOR UPDATE SKIP LOCKED
+    </select>
+
+    <update id="claimEvent">
+        UPDATE tb_business_outbox
+        SET state='SENDING',lease_owner=#{leaseOwner},lease_until=TIMESTAMPADD(SECOND,#{leaseSeconds},NOW(3))
+        WHERE id=#{eventId}
+    </update>
+
+    <update id="renewLease">
+        UPDATE tb_business_outbox
+        SET lease_until=TIMESTAMPADD(SECOND,#{leaseSeconds},NOW(3))
+        WHERE id=#{eventId} AND state='SENDING' AND lease_owner=#{leaseOwner}
+    </update>
+
+    <update id="markSent">
+        UPDATE tb_business_outbox
+        SET state='SENT',sent_at=NOW(3),lease_owner=NULL,lease_until=NULL,last_error=NULL
+        WHERE id=#{eventId} AND state='SENDING' AND lease_owner=#{leaseOwner}
+    </update>
+
+    <update id="deferDeadline">
+        UPDATE tb_business_outbox
+        SET state='PENDING',next_attempt_at=deliver_at,lease_owner=NULL,lease_until=NULL
+        WHERE id=#{eventId} AND state='SENDING' AND lease_owner=#{leaseOwner}
+    </update>
+
+    <update id="recordSendFailure">
+        UPDATE tb_business_outbox
+        SET attempts=#{attempts},next_attempt_at=TIMESTAMPADD(SECOND,#{delaySeconds},NOW()),state=#{state},last_error=#{lastError},lease_owner=NULL,lease_until=NULL
+        WHERE id=#{eventId} AND state='SENDING' AND lease_owner=#{leaseOwner}
+    </update>
+
+    <update id="redriveUnconsumedEvents">
+        UPDATE tb_business_outbox
+        SET state='PENDING',next_attempt_at=NOW(),sent_at=NULL
+        WHERE state='SENT' AND sent_at&lt;TIMESTAMPADD(SECOND,#{sentAgeSeconds},NOW(3)) AND (deliver_at IS NULL OR deliver_at&lt;TIMESTAMPADD(SECOND,#{deadlineAgeSeconds},NOW(3)))
+        ORDER BY id LIMIT 200
+    </update>
+
+    <select id="countPendingEvents" resultType="Long">
+        SELECT COUNT(*)
+        FROM tb_business_outbox
+        WHERE state IN ('PENDING','SENDING')
+    </select>
+
+    <select id="countReviewEvents" resultType="Long">
+        SELECT COUNT(*)
+        FROM tb_business_outbox
+        WHERE state='REVIEW'
+    </select>
+
+    <select id="countDueSentEvents" resultType="Long">
+        SELECT COUNT(*)
+        FROM tb_business_outbox
+        WHERE state='SENT' AND (deliver_at IS NULL OR deliver_at&lt;=NOW(3))
+    </select>
+
+    <update id="updateCursor">
+        UPDATE tb_business_outbox
+        SET cursor_id=#{cursorId}
+        WHERE id=#{eventId}
+    </update>
+</mapper>

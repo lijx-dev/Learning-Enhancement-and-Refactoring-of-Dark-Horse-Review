@@ -1,0 +1,348 @@
+{
+  "generated_at": "2026-10-10T14:02:40.603975+00:00",
+  "round": 5,
+  "environment": "isolated MySQL 8 / Redis 7 / Memcached 1.6 / Canal 1.1.8 / RocketMQ 5.3.2 / Kafka 3.9.1 / Java 8",
+  "total_tests": 77,
+  "java_suites": [
+    {
+      "name": "com.hmdp.MapperArchitectureTest",
+      "tests": "3",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.703"
+    },
+    {
+      "name": "com.hmdp.MockPaymentTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0"
+    },
+    {
+      "name": "com.hmdp.ShopCacheCompatibilityTest",
+      "tests": "2",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.001"
+    },
+    {
+      "name": "com.hmdp.ShopSearchBoundaryTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0"
+    },
+    {
+      "name": "com.hmdp.UserLogoutTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.565"
+    },
+    {
+      "name": "com.hmdp.VoucherOrderReliabilityTest",
+      "tests": "3",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.28"
+    },
+    {
+      "name": "com.hmdp.analytics.BehaviorAggregationIntegrationTest",
+      "tests": "5",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "1.558"
+    },
+    {
+      "name": "com.hmdp.analytics.KafkaBehaviorIntegrationTest",
+      "tests": "2",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "6.827"
+    },
+    {
+      "name": "com.hmdp.cache.CacheBenchmarkIntegrationTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "19.21"
+    },
+    {
+      "name": "com.hmdp.cache.CacheCdcIntegrationTest",
+      "tests": "3",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "13.165"
+    },
+    {
+      "name": "com.hmdp.cache.CacheChangeProjectorTest",
+      "tests": "3",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.497"
+    },
+    {
+      "name": "com.hmdp.cache.CacheLayersIntegrationTest",
+      "tests": "7",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "13.995"
+    },
+    {
+      "name": "com.hmdp.cache.CanalBatchTest",
+      "tests": "3",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "1.4"
+    },
+    {
+      "name": "com.hmdp.cache.RequestCacheScopeTest",
+      "tests": "2",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0"
+    },
+    {
+      "name": "com.hmdp.messaging.MessagingIntegrationTest",
+      "tests": "13",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "2.477"
+    },
+    {
+      "name": "com.hmdp.messaging.RocketMqIntegrationTest",
+      "tests": "3",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "14.332"
+    },
+    {
+      "name": "com.hmdp.reliability.AccessGuardTest",
+      "tests": "2",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0"
+    },
+    {
+      "name": "com.hmdp.reliability.CacheConcurrencyTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "2.044"
+    },
+    {
+      "name": "com.hmdp.reliability.LoginCodeTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.004"
+    },
+    {
+      "name": "com.hmdp.reliability.ReliabilityIntegrationTest",
+      "tests": "19",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "8.821"
+    },
+    {
+      "name": "com.hmdp.reliability.SeckillMessageTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.021"
+    }
+  ],
+  "benchmark": "cache-benchmark.json",
+  "monitoring": {
+    "prometheus_targets": [
+      "hmdp",
+      "canal"
+    ],
+    "healthy": true,
+    "alert_rules_validated": 18,
+    "external_notifications": false
+  },
+  "frontend": "original static hmdp frontend; no source changes",
+  "citylens_modified_in_this_round": false,
+  "packaging": {
+    "success": true,
+    "jar": "target/hm-dianping-0.0.1-SNAPSHOT.jar",
+    "bytes": 103928370,
+    "zip_integrity": true,
+    "flyway_migrations": 9,
+    "sha256": "6bd60e3dc688176de4a7202640718b9e251270d9cf508368d2aac8dd2886d6db"
+  },
+  "messaging": {
+    "rocketmq_real_broker_tests": 3,
+    "kafka_real_broker_tests": 2,
+    "new_tests": 23,
+    "local_single_broker": true,
+    "visits_best_effort": true
+  },
+  "runtime_smoke": {
+    "api_health": "UP",
+    "frontend_http_status": 200,
+    "shop_api_status": 200,
+    "shop_proxy_status": 200,
+    "metrics_anonymous_status": 401,
+    "ops_anonymous_status": 401,
+    "metrics_authorized_status": 200,
+    "hmdp_mq_client_started": 1.0,
+    "hmdp_kafka_consumer_running": 1.0,
+    "heat_api_success": true,
+    "prometheus_targets": {
+      "canal": "up",
+      "hmdp": "up"
+    },
+    "citylens_source_unchanged": true,
+    "frontend_sha256": "b69229ffe88dfffba32321b9846cfa90bbfd4875120eed8cedcd8a9e159f4321"
+  },
+  "package_build_success": true,
+  "mapper_refactor": {
+    "production_jdbc_files": 0,
+    "controller_dependencies": "service interfaces",
+    "sql_location": "src/main/resources/mapper",
+    "mapper_xml_files": 13,
+    "architecture_tests": 3,
+    "flyway_initialization_order_verified": true,
+    "package_bytes": 103928370,
+    "package_sha256": "6bd60e3dc688176de4a7202640718b9e251270d9cf508368d2aac8dd2886d6db",
+    "field_injection_style": "Imported field types; annotations formatted with Google Java Style"
+  },
+  "java_style": {
+    "guide": "https://google.github.io/styleguide/javaguide.html",
+    "formatter": "google-java-format 1.7 (Google mode)",
+    "java_files": 153,
+    "indent_spaces": 2,
+    "column_limit": 100,
+    "split_variable_declaration_groups": 24,
+    "expanded_wildcard_imports": 77,
+    "qualified_type_references_replaced_with_imports": 101,
+    "formatter_check_passed": true,
+    "checkstyle_version": "8.45.1",
+    "checkstyle_config": "config/checkstyle/checkstyle.xml",
+    "checkstyle_violations": 0,
+    "all_main_and_test_sources_compiled": true,
+    "regression_suites": [
+      {
+        "name": "com.hmdp.MapperArchitectureTest",
+        "tests": "3",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "com.hmdp.MockPaymentTest",
+        "tests": "1",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "com.hmdp.ShopCacheCompatibilityTest",
+        "tests": "2",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "com.hmdp.ShopSearchBoundaryTest",
+        "tests": "1",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "com.hmdp.UserLogoutTest",
+        "tests": "1",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "com.hmdp.VoucherOrderReliabilityTest",
+        "tests": "3",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "com.hmdp.cache.CacheChangeProjectorTest",
+        "tests": "3",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "com.hmdp.cache.CanalBatchTest",
+        "tests": "3",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "com.hmdp.cache.RequestCacheScopeTest",
+        "tests": "2",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "com.hmdp.reliability.AccessGuardTest",
+        "tests": "2",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "com.hmdp.reliability.CacheConcurrencyTest",
+        "tests": "1",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "com.hmdp.reliability.LoginCodeTest",
+        "tests": "1",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "com.hmdp.reliability.SeckillMessageTest",
+        "tests": "1",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      }
+    ],
+    "regression_tests": 24,
+    "regression_failures": 0,
+    "regression_errors": 0,
+    "regression_skipped": 0,
+    "regression_scope": "13 unit suites; previous integration results above were not rerun for this formatting change",
+    "citylens_source_unchanged": true,
+    "default_frontend_unchanged": true
+  }
+}

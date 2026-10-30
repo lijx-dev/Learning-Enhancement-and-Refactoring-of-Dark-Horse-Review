@@ -1,0 +1,93 @@
+groups:
+  - name: dianping
+    rules:
+      - alert: BusinessEventsBacklog
+        expr: max(hmdp_outbox_pending) > 200 or max(hmdp_outbox_inflight) > 200
+        for: 2m
+        labels: {severity: warning}
+        annotations: {summary: "业务事件待发送或到期后未消费积压"}
+      - alert: BusinessEventsNeedReview
+        expr: max(hmdp_outbox_review) > 0
+        for: 1m
+        labels: {severity: warning}
+        annotations: {summary: "RocketMQ 业务事件需要人工复核"}
+      - alert: BusinessEventsSendRetry
+        expr: sum(rate(hmdp_mq_sends_total{result="retry"}[5m])) > 0.1
+        for: 1m
+        labels: {severity: warning}
+        annotations: {summary: "RocketMQ 投递未确认，Outbox 正在退避重试"}
+      - alert: BehaviorConsumerStopped
+        expr: hmdp_kafka_consumer_running == 0
+        for: 1m
+        labels: {severity: warning}
+        annotations: {summary: "Kafka 商家热度消费者已停止"}
+      - alert: BehaviorConsumerBacklog
+        expr: max(hmdp_kafka_consumer_lag) > 1000
+        for: 2m
+        labels: {severity: warning}
+        annotations: {summary: "Kafka 行为消息消费积压超过 1000 条"}
+      - alert: BehaviorVisitsDropped
+        expr: sum(rate(hmdp_kafka_visits_total{result="dropped"}[5m])) > 1
+        for: 1m
+        labels: {severity: warning}
+        annotations: {summary: "浏览统计出现丢弃，请检查 Kafka 和有界发送队列"}
+      - alert: BehaviorEventsNeedReview
+        expr: max(hmdp_analytics_outbox_review) > 0 or max(hmdp_analytics_outbox_pending) > 200
+        for: 1m
+        labels: {severity: warning}
+        annotations: {summary: "订单分析事件待处理或需要人工复核"}
+      - alert: DianpingApiDown
+        expr: up{job="hmdp"} == 0
+        for: 1m
+        labels: {severity: critical}
+        annotations: {summary: "点评接口或监控凭证不可用"}
+      - alert: CanalServerDown
+        expr: up{job="canal"} == 0
+        for: 1m
+        labels: {severity: critical}
+        annotations: {summary: "Canal 服务不可达"}
+      - alert: CacheMemcacheFailure
+        expr: sum(rate(hmdp_memcache_operations_total{result="error"}[5m])) > 0.1
+        for: 1m
+        labels: {severity: warning}
+        annotations: {summary: "Memcache 故障，读取正在回退 Redis"}
+      - alert: CacheCdcDisconnected
+        expr: (max(hmdp_cdc_connected) == 0) and (max(hmdp_cdc_enabled) == 1)
+        for: 1m
+        labels: {severity: critical}
+        annotations: {summary: "Canal 同步连接中断"}
+      - alert: CacheCdcPollingStalled
+        expr: hmdp_cdc_poll_age_seconds > 30 and hmdp_cdc_connected == 1
+        for: 1m
+        labels: {severity: critical}
+        annotations: {summary: "Canal 消费者停止轮询"}
+      - alert: CacheCdcRetries
+        expr: sum(increase(hmdp_cdc_batches_total{result="retry"}[5m])) > 0
+        for: 1m
+        labels: {severity: warning}
+        annotations: {summary: "CDC 批次正在重放，请检查结构迁移和缓存依赖"}
+      - alert: CacheCdcDelay
+        expr: histogram_quantile(0.95, sum by(le)(rate(hmdp_cdc_event_delay_seconds_bucket[5m]))) > 10
+        for: 2m
+        labels: {severity: warning}
+        annotations: {summary: "Canal 事件处理延迟超过 10 秒"}
+      - alert: SeckillBacklog
+        expr: max(hmdp_seckill_lag) > 1000 or max(hmdp_seckill_pending) > 100
+        for: 1m
+        labels: {severity: warning}
+        annotations: {summary: "秒杀消息积压或 Pending 过高"}
+      - alert: SeckillNeedsReview
+        expr: max(hmdp_seckill_review) > 0
+        for: 1m
+        labels: {severity: warning}
+        annotations: {summary: "存在需要人工复核的秒杀预占"}
+      - alert: SeckillConsumptionSlow
+        expr: histogram_quantile(0.95, sum by(le)(rate(hmdp_seckill_consume_seconds_bucket[5m]))) > 1
+        for: 2m
+        labels: {severity: warning}
+        annotations: {summary: "秒杀消费 P95 超过 1 秒"}
+      - alert: ShopResponseSlow
+        expr: histogram_quantile(0.95, sum by(le)(rate(http_server_requests_seconds_bucket{uri="/shop/{id}"}[5m]))) > 0.2
+        for: 2m
+        labels: {severity: warning}
+        annotations: {summary: "店铺详情接口 P95 超过 200 毫秒"}

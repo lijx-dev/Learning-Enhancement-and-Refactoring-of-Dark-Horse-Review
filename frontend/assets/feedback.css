@@ -1,0 +1,240 @@
+.site-footer {
+  max-width: 1280px;
+  width: calc(100% - 80px);
+  margin: 58px auto 0;
+  border-top: 1px solid #e5e6dc;
+  padding: 28px 0 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #aeada2;
+  font-size: 10px;
+}
+.footer-brand {
+  color: #77796b;
+  font-size: 14px;
+  font-weight: 600;
+}
+.footer-brand > span {
+  color: #aba99e;
+  font-size: 10px;
+  margin-left: 14px;
+  font-weight: 400;
+}
+.site-footer > div {
+  display: flex;
+  gap: 16px;
+}
+.site-footer a:hover {
+  color: var(--orange-dark);
+}
+.empty-state {
+  padding: 80px 32px;
+  text-align: center;
+  color: #979a8c;
+}
+.empty-state > i {
+  font-size: 42px;
+  color: #c7c6b8;
+}
+.empty-state h3,
+.empty-state h2 {
+  color: #727667;
+  font-size: 19px;
+  margin: 20px 0 10px;
+}
+.empty-state p {
+  font-size: 12px;
+  margin-bottom: 20px;
+}
+.empty-state h1 {
+  font-size: 26px;
+  margin-bottom: 15px;
+  color: #696d5e;
+}
+.empty-state .button {
+  margin-top: 5px;
+}
+.inline-empty {
+  color: #a4a395;
+  border: 1px dashed #deded3;
+  padding: 26px;
+  text-align: center;
+  border-radius: 12px;
+  font-size: 12px;
+}
+.error-state:not(.empty-state) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  background: #fff0e6;
+  color: #bd7952;
+  font-size: 12px;
+  padding: 17px;
+  margin-bottom: 20px;
+  border-radius: 10px;
+}
+.spinner {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  border: 2px solid #e6e1d4;
+  border-top-color: var(--orange);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  vertical-align: middle;
+  margin-right: 9px;
+}
+.skeleton-card {
+  overflow: hidden;
+  border-radius: var(--radius);
+  background: white;
+  border: 1px solid var(--line);
+  padding-bottom: 20px;
+}
+.skeleton-card > div {
+  aspect-ratio: 1.2;
+  background: #ebece3;
+  animation: breathe 1.3s ease infinite alternate;
+}
+.skeleton-card > span {
+  display: block;
+  margin: 17px 16px 0;
+  height: 12px;
+  border-radius: 4px;
+  background: #f0f0e8;
+}
+.skeleton-card > span:last-child {
+  width: 50%;
+}
+.toast-message {
+  position: fixed;
+  z-index: 100;
+  top: 99px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 700px;
+  border-radius: 11px;
+  padding: 14px 18px;
+  background: white;
+  border: 1px solid #e3e9db;
+  box-shadow: 0 8px 30px rgb(35 36 23 / 10%);
+  color: #6b8260;
+  font-size: 13px;
+}
+.toast-message.error {
+  color: #c77249;
+  border-color: #ffe0c8;
+}
+.toast-message > i {
+  font-size: 19px;
+}
+.toast-message .icon-button {
+  margin-left: 10px;
+  color: #b2b2a6;
+}
+.toast-enter-active,
+.toast-leave-active {
+  transition:
+    opacity 0.15s,
+    top 0.15s;
+}
+.toast-enter,
+.toast-leave-to {
+  opacity: 0;
+  top: 85px;
+}
+.dialog-overlay {
+  position: fixed;
+  z-index: 90;
+  inset: 0;
+  background: rgb(35 36 27 / 30%);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.dialog {
+  position: relative;
+  width: 470px;
+  border-radius: 22px;
+  padding: 36px;
+  background: white;
+  box-shadow: 0 15px 70px rgb(40 36 25 / 20%);
+}
+.dialog-close {
+  position: absolute;
+  top: 19px;
+  right: 20px;
+  color: #9c9e8e;
+}
+.dialog-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 53px;
+  height: 53px;
+  border-radius: 15px;
+  background: var(--peach);
+  color: var(--orange);
+  font-size: 28px;
+  margin-bottom: 23px;
+}
+.dialog h2 {
+  font-size: 22px;
+  margin-bottom: 16px;
+}
+.dialog > p {
+  color: #898b7c;
+  font-size: 13px;
+}
+.dialog-price {
+  font-size: 31px;
+  color: var(--orange-dark);
+  margin: 17px 0;
+}
+.dialog .dialog-rules {
+  white-space: pre-wrap;
+  font-size: 12px;
+  line-height: 1.8;
+  padding: 13px;
+  background: #f8f8f2;
+  border-radius: 9px;
+  margin-bottom: 20px;
+}
+.dialog > .muted {
+  font-size: 11px;
+  line-height: 1.9;
+}
+.dialog-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 13px;
+  margin-top: 26px;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes breathe {
+  to {
+    opacity: 0.5;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

@@ -1,0 +1,1702 @@
+{
+  "generated_at": "2026-10-10T14:50:29.319843+00:00",
+  "conclusion": "核心亮点已有可复现验证且本次 77 项功能测试通过，但不能宣称所有接口和全部生产故障场景均已验证。标准构建的 Checkstyle 仍失败。",
+  "scope": {
+    "business_routes": 62,
+    "actuator_routes": 2,
+    "declared_routes_total": 64,
+    "live_public_read_successes": 14,
+    "live_public_health_successes": 1,
+    "invalid_login_input_rejections": 2,
+    "anonymous_denials": 47,
+    "source_test_classes": 24,
+    "source_annotated_tests": 83,
+    "executed_test_classes": 21,
+    "excluded_original_demo_classes": [
+      "HmDianPingApplicationTests",
+      "RedissonTest",
+      "NormalTest"
+    ],
+    "source_code_changed": false,
+    "citylens_changed": false,
+    "token_quota_migration": "excluded_by_user"
+  },
+  "build_gate": {
+    "status": "failed",
+    "checkstyle_violations": [
+      {
+        "file": "src/main/java/com/hmdp/service/impl/BusinessEventServiceImpl.java",
+        "line": 143,
+        "column": 13,
+        "message": "(indentation) Indentation: 'businessOutboxMapper' has incorrect indentation level 12, expected level should be 14."
+      },
+      {
+        "file": "src/main/java/com/hmdp/service/impl/BusinessEventServiceImpl.java",
+        "line": 160,
+        "column": 17,
+        "message": "(indentation) Indentation: 'OutboxRelayServiceImpl' has incorrect indentation level 16, expected level should be 18."
+      },
+      {
+        "file": "src/main/java/com/hmdp/service/impl/BusinessEventServiceImpl.java",
+        "line": 169,
+        "column": 11,
+        "message": "(indentation) Indentation: 'group' has incorrect indentation level 10, expected level should be 12."
+      },
+      {
+        "file": "src/main/java/com/hmdp/service/impl/BusinessEventServiceImpl.java",
+        "line": 170,
+        "column": 11,
+        "message": "(indentation) Indentation: 'key' has incorrect indentation level 10, expected level should be 12."
+      },
+      {
+        "file": "src/main/java/com/hmdp/service/impl/BusinessEventServiceImpl.java",
+        "line": 171,
+        "column": 11,
+        "message": "(indentation) Indentation: 'valid' has incorrect indentation level 10, expected level should be 12."
+      },
+      {
+        "file": "src/main/java/com/hmdp/service/impl/BusinessEventServiceImpl.java",
+        "line": 172,
+        "column": 11,
+        "message": "(indentation) Indentation: 'brokerId' has incorrect indentation level 10, expected level should be 12."
+      },
+      {
+        "file": "src/main/java/com/hmdp/service/impl/BusinessEventServiceImpl.java",
+        "line": 173,
+        "column": 11,
+        "message": "(indentation) Indentation: 'payload' has incorrect indentation level 10, expected level should be 12."
+      },
+      {
+        "file": "src/main/java/com/hmdp/service/impl/BusinessEventServiceImpl.java",
+        "line": 174,
+        "column": 11,
+        "message": "(indentation) Indentation: 'OutboxRelayServiceImpl' has incorrect indentation level 10, expected level should be 12."
+      },
+      {
+        "file": "src/main/java/com/hmdp/service/impl/BusinessEventServiceImpl.java",
+        "line": 180,
+        "column": 13,
+        "message": "(indentation) Indentation: 'OutboxRelayServiceImpl' has incorrect indentation level 12, expected level should be 14."
+      },
+      {
+        "file": "src/main/java/com/hmdp/service/impl/BusinessEventServiceImpl.java",
+        "line": 181,
+        "column": 13,
+        "message": "(indentation) Indentation: '>' has incorrect indentation level 12, expected level should be 14."
+      },
+      {
+        "file": "src/main/java/com/hmdp/service/impl/BusinessEventServiceImpl.java",
+        "line": 183,
+        "column": 15,
+        "message": "(indentation) Indentation: '\"mq:outbox:\"' has incorrect indentation level 14, expected level should be 16."
+      },
+      {
+        "file": "src/main/java/com/hmdp/service/impl/BusinessEventServiceImpl.java",
+        "line": 184,
+        "column": 15,
+        "message": "(indentation) Indentation: 'event' has incorrect indentation level 14, expected level should be 16."
+      },
+      {
+        "file": "src/main/java/com/hmdp/service/impl/BusinessEventServiceImpl.java",
+        "line": 185,
+        "column": 15,
+        "message": "(indentation) Indentation: 'payload' has incorrect indentation level 14, expected level should be 16."
+      },
+      {
+        "file": "src/main/java/com/hmdp/service/impl/BusinessEventServiceImpl.java",
+        "line": 186,
+        "column": 15,
+        "message": "(indentation) Indentation: 'OutboxRelayServiceImpl' has incorrect indentation level 14, expected level should be 16."
+      },
+      {
+        "file": "src/main/java/com/hmdp/service/impl/BusinessEventServiceImpl.java",
+        "line": 191,
+        "column": 11,
+        "message": "(indentation) Indentation: 'method call' child has incorrect indentation level 10, expected level should be one of the following: 12, 14, 16."
+      }
+    ]
+  },
+  "functional_tests": {
+    "status": "passed",
+    "checkstyle_skipped_for_this_command_only": true,
+    "tests": 77,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": [
+      {
+        "name": "com.hmdp.cache.CacheLayersIntegrationTest",
+        "tests": 7,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "time_seconds": 8.053
+      },
+      {
+        "name": "com.hmdp.cache.CanalBatchTest",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "time_seconds": 0.387
+      },
+      {
+        "name": "com.hmdp.cache.RequestCacheScopeTest",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "time_seconds": 0.006
+      },
+      {
+        "name": "com.hmdp.cache.CacheBenchmarkIntegrationTest",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "time_seconds": 11.711
+      },
+      {
+        "name": "com.hmdp.cache.CacheChangeProjectorTest",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "time_seconds": 0.106
+      },
+      {
+        "name": "com.hmdp.cache.CacheCdcIntegrationTest",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "time_seconds": 11.752
+      },
+      {
+        "name": "com.hmdp.UserLogoutTest",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "time_seconds": 0.086
+      },
+      {
+        "name": "com.hmdp.ShopCacheCompatibilityTest",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "time_seconds": 0.0
+      },
+      {
+        "name": "com.hmdp.reliability.ReliabilityIntegrationTest",
+        "tests": 19,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "time_seconds": 3.759
+      },
+      {
+        "name": "com.hmdp.reliability.SeckillMessageTest",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "time_seconds": 0.012
+      },
+      {
+        "name": "com.hmdp.reliability.LoginCodeTest",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "time_seconds": 0.0
+      },
+      {
+        "name": "com.hmdp.reliability.CacheConcurrencyTest",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "time_seconds": 2.015
+      },
+      {
+        "name": "com.hmdp.reliability.AccessGuardTest",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "time_seconds": 0.0
+      },
+      {
+        "name": "com.hmdp.MapperArchitectureTest",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "time_seconds": 0.158
+      },
+      {
+        "name": "com.hmdp.VoucherOrderReliabilityTest",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "time_seconds": 0.15
+      },
+      {
+        "name": "com.hmdp.MockPaymentTest",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "time_seconds": 0.001
+      },
+      {
+        "name": "com.hmdp.ShopSearchBoundaryTest",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "time_seconds": 0.0
+      },
+      {
+        "name": "com.hmdp.messaging.MessagingIntegrationTest",
+        "tests": 13,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "time_seconds": 1.709
+      },
+      {
+        "name": "com.hmdp.messaging.RocketMqIntegrationTest",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "time_seconds": 16.5
+      },
+      {
+        "name": "com.hmdp.analytics.KafkaBehaviorIntegrationTest",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "time_seconds": 6.227
+      },
+      {
+        "name": "com.hmdp.analytics.BehaviorAggregationIntegrationTest",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "time_seconds": 1.018
+      }
+    ]
+  },
+  "runtime_flags": {
+    "admin_configured": "false",
+    "mq_enabled": "true",
+    "mq_seckill_enabled": "true",
+    "analytics_enabled": "true",
+    "cdc_enabled": "true",
+    "memcache_enabled": "true",
+    "mock_payment_enabled": "false"
+  },
+  "runtime_metric_snapshot": {
+    "hmdp_cdc_connected": 1.0,
+    "hmdp_mq_client_started": 1.0,
+    "hmdp_kafka_consumer_running": 1.0,
+    "hmdp_kafka_consumer_lag": 0.0,
+    "hmdp_seckill_lag": 0.0,
+    "hmdp_seckill_pending": 0.0,
+    "hmdp_seckill_review": 0.0,
+    "hmdp_cdc_poll_age_seconds": 0.439
+  },
+  "monitoring": {
+    "targets": [
+      {
+        "job": "canal",
+        "health": "up"
+      },
+      {
+        "job": "hmdp",
+        "health": "up"
+      }
+    ],
+    "alert_rules": 18,
+    "rules_all_healthy": true,
+    "external_notifications_configured": false
+  },
+  "features": [
+    {
+      "feature": "请求内缓存、LoadingCache、Memcache、版本命名空间和回填",
+      "tests": [
+        "RequestCacheScopeTest",
+        "CacheLayersIntegrationTest",
+        "CacheChangeProjectorTest"
+      ],
+      "boundary": "同一 JVM 内独立 CacheClient 与并发线程；未部署多个 Java 节点做故障演练"
+    },
+    {
+      "feature": "空值缓存、互斥重建、旧回填隔离、TTL、Memcache 故障回退",
+      "tests": [
+        "CacheLayersIntegrationTest",
+        "CacheConcurrencyTest",
+        "ShopCacheCompatibilityTest",
+        "ReliabilityIntegrationTest"
+      ],
+      "boundary": "未实测 Redis Cluster、主从切换或持续缓存雪崩负载"
+    },
+    {
+      "feature": "Canal 外部 SQL 变更、删除、券换店、重连、成功后 ACK",
+      "tests": [
+        "CacheCdcIntegrationTest",
+        "CanalBatchTest",
+        "CacheChangeProjectorTest"
+      ],
+      "boundary": "真实单实例 Canal/MySQL；未测长时间 binlog 过期或集群切换"
+    },
+    {
+      "feature": "Lua 抢购、最后库存并发竞争、重复下单、事务与资格唯一约束",
+      "tests": [
+        "ReliabilityIntegrationTest",
+        "VoucherOrderReliabilityTest"
+      ],
+      "boundary": "测试直接调用 Service；不是 HTTP 秒杀容量压测"
+    },
+    {
+      "feature": "Stream pending 接管、毒消息隔离、状态、补偿、恢复和对账",
+      "tests": [
+        "ReliabilityIntegrationTest",
+        "SeckillMessageTest"
+      ],
+      "boundary": "相关管理 HTTP 成功路径尚未系统覆盖；当前应用无管理员白名单"
+    },
+    {
+      "feature": "Outbox、Inbox 幂等、发送确认丢失、消费先完成、租约恢复",
+      "tests": [
+        "MessagingIntegrationTest",
+        "RocketMqIntegrationTest"
+      ],
+      "boundary": "可控故障与真实单 Broker；未测宿主机断电或多副本切换"
+    },
+    {
+      "feature": "RocketMQ 秒杀履约、重复投递、延迟关单与支付竞态",
+      "tests": [
+        "RocketMqIntegrationTest",
+        "MessagingIntegrationTest"
+      ],
+      "boundary": "3 项真实 Broker 测试；支付为本地模拟，当前业务环境关闭模拟支付"
+    },
+    {
+      "feature": "Kafka 浏览采集、交易 Outbox、PV/UV 窗口与去重",
+      "tests": [
+        "KafkaBehaviorIntegrationTest",
+        "BehaviorAggregationIntegrationTest"
+      ],
+      "boundary": "2 项真实 Broker 测试；浏览采集允许丢失，不宣称跨存储 Exactly Once"
+    },
+    {
+      "feature": "普通券防重、取消重下、订单快照、超时关闭",
+      "tests": [
+        "ReliabilityIntegrationTest",
+        "MessagingIntegrationTest",
+        "MockPaymentTest",
+        "VoucherOrderReliabilityTest"
+      ],
+      "boundary": "HTTP 登录下单查单完整闭环尚未系统覆盖；无真实支付、退款、核销"
+    },
+    {
+      "feature": "点赞关注幂等、Feed 分发、图片归属、删除发布竞态与重试",
+      "tests": [
+        "ReliabilityIntegrationTest",
+        "UserLogoutTest"
+      ],
+      "boundary": "部分测 Controller/Service，未覆盖所有 HTTP 绑定、分页和错误输入"
+    },
+    {
+      "feature": "登录验证码限流与一次性消费、鉴权、监控凭证、管理员隔离",
+      "tests": [
+        "LoginCodeTest",
+        "AccessGuardTest",
+        "CacheLayersIntegrationTest",
+        "ReliabilityIntegrationTest"
+      ],
+      "boundary": "真实短信不在范围；签到与连续签到缺少专门自动断言"
+    },
+    {
+      "feature": "搜索数据库分页、边界与 Mapper 分层",
+      "tests": [
+        "ShopSearchBoundaryTest",
+        "ReliabilityIntegrationTest",
+        "MapperArchitectureTest"
+      ],
+      "boundary": "catalog/batch/areas 当前公开读取成功；新增创建与修改 HTTP 场景仍需补齐"
+    },
+    {
+      "feature": "缓存 HTTP 基线对照",
+      "tests": [
+        "CacheBenchmarkIntegrationTest"
+      ],
+      "boundary": "单实例热 key、8 并发、每阶段 10000 次；不能用来宣称秒杀或生产容量"
+    },
+    {
+      "feature": "Prometheus 指标与 18 条告警规则",
+      "tests": [
+        "CacheLayersIntegrationTest",
+        "AccessGuardTest"
+      ],
+      "boundary": "targets up、规则 health=ok；未触发全部告警或验证外部通知"
+    }
+  ],
+  "issues": [
+    {
+      "priority": "P1",
+      "issue": "默认测试命令被 15 处 Checkstyle 违规拦住",
+      "source": "src/main/java/com/hmdp/service/impl/BusinessEventServiceImpl.java",
+      "recommendation": "统一 quarantine 方法排版后重跑标准 Maven 命令；本次没有修改业务源码"
+    },
+    {
+      "priority": "P1",
+      "issue": "64 个路由尚未全量覆盖已登录与管理员 HTTP 成功场景",
+      "examples": [
+        "POST /user/sign",
+        "GET /user/sign/count",
+        "GET /user/info/{id}",
+        "GET /follow/common/{id}",
+        "POST /shop",
+        "PUT /shop",
+        "POST /voucher",
+        "POST /voucher/seckill",
+        "POST /ops/outbox/{id}/retry",
+        "POST /ops/analytics/outbox/{eventId}/retry"
+      ],
+      "recommendation": "在独立测试库补 HTTP 合同测试和可导入的接口集合，区分成功、非法参数、越权、幂等及最终状态"
+    },
+    {
+      "priority": "P1",
+      "issue": "当前管理员白名单为空，无法直接演示管理和补偿接口的成功路径",
+      "recommendation": "使用专门演示账号配置 HMDP_ADMIN_IDS 后重建 Java 服务；本轮未改配置或重启业务服务"
+    },
+    {
+      "priority": "P2",
+      "issue": "监控规则可加载，但未验证告警触发到通知的完整链路",
+      "recommendation": "在隔离环境注入 CDC/MQ/消费者故障，核对触发与恢复；外部通知需单独配置"
+    },
+    {
+      "priority": "P2",
+      "issue": "尚无持续 HTTP 秒杀负载、真实多节点和高可用故障验证",
+      "recommendation": "补抢购并发阶梯负载、队列积压恢复和两个独立应用节点的消费者接管演练"
+    }
+  ],
+  "not_implemented_or_out_of_scope": [
+    "BlogCommentsController 为空，无评论处理接口",
+    "真实支付与退款",
+    "真实短信发送",
+    "Token 包、额度账本和权益账户迁移",
+    "Redis Cluster 同槽改造及高可用演练"
+  ],
+  "benchmark": {
+    "generated_at": "2026-10-10T14:47:58.073Z",
+    "endpoint": "GET /shop/1",
+    "requests_per_phase": 10000,
+    "concurrency": 8,
+    "warmup_per_phase": 200,
+    "environment": "Linux aarch64, Java 1.8.0_504",
+    "cpu_available_to_jvm": 10,
+    "jvm_max_heap_bytes": 477626368,
+    "database": "8.0.46",
+    "baseline": {
+      "successes": 10000,
+      "errors": 0,
+      "duration_seconds": 7.09158492,
+      "qps": 1410.1220126120975,
+      "p50_ms": 1.556917,
+      "p95_ms": 10.485,
+      "p99_ms": 52.026708,
+      "measured_mysql_detail_loads": 10000.0,
+      "cold_request_mysql_detail_loads": 1.0
+    },
+    "optimized": {
+      "successes": 10000,
+      "errors": 0,
+      "duration_seconds": 0.892533293,
+      "qps": 11204.063846613284,
+      "p50_ms": 0.543584,
+      "p95_ms": 1.559708,
+      "p99_ms": 3.553709,
+      "measured_mysql_detail_loads": 0.0,
+      "cold_request_mysql_detail_loads": 1.0
+    },
+    "scope": "Isolated Docker MySQL 8 / Redis 7 / Memcached 1.6. One Java instance; warm hot-key HTTP test, not a production capacity claim."
+  },
+  "interfaces": [
+    {
+      "method": "POST",
+      "path": "/blog",
+      "handler": "saveBlog",
+      "source": "src/main/java/com/hmdp/controller/BlogController.java",
+      "line": 27,
+      "access": "login",
+      "live_check": {
+        "url": "/blog",
+        "http_status": 401,
+        "success": false,
+        "error": "请先登录",
+        "elapsed_ms": 12.89,
+        "evidence": "anonymous_denial_only",
+        "expected": 401
+      },
+      "coverage_note": "本轮仅验证匿名 HTTP 401；实现及成功业务路径见相关亮点测试，不能据此认定该接口完整覆盖"
+    },
+    {
+      "method": "PUT",
+      "path": "/blog/like/{id}",
+      "handler": "likeBlog",
+      "source": "src/main/java/com/hmdp/controller/BlogController.java",
+      "line": 32,
+      "access": "login",
+      "live_check": {
+        "url": "/blog/like/1",
+        "http_status": 401,
+        "success": false,
+        "error": "请先登录",
+        "elapsed_ms": 3.3,
+        "evidence": "anonymous_denial_only",
+        "expected": 401
+      },
+      "coverage_note": "本轮仅验证匿名 HTTP 401；实现及成功业务路径见相关亮点测试，不能据此认定该接口完整覆盖"
+    },
+    {
+      "method": "PUT",
+      "path": "/blog/like/{id}/state",
+      "handler": "setLike",
+      "source": "src/main/java/com/hmdp/controller/BlogController.java",
+      "line": 37,
+      "access": "login",
+      "live_check": {
+        "url": "/blog/like/1/state?liked=true",
+        "http_status": 401,
+        "success": false,
+        "error": "请先登录",
+        "elapsed_ms": 5.96,
+        "evidence": "anonymous_denial_only",
+        "expected": 401
+      },
+      "coverage_note": "本轮仅验证匿名 HTTP 401；实现及成功业务路径见相关亮点测试，不能据此认定该接口完整覆盖"
+    },
+    {
+      "method": "GET",
+      "path": "/blog/of/me",
+      "handler": "queryMyBlog",
+      "source": "src/main/java/com/hmdp/controller/BlogController.java",
+      "line": 42,
+      "access": "login",
+      "live_check": {
+        "url": "/blog/of/me",
+        "http_status": 401,
+        "success": false,
+        "error": "请先登录",
+        "elapsed_ms": 2.59,
+        "evidence": "anonymous_denial_only",
+        "expected": 401
+      },
+      "coverage_note": "本轮仅验证匿名 HTTP 401；实现及成功业务路径见相关亮点测试，不能据此认定该接口完整覆盖"
+    },
+    {
+      "method": "GET",
+      "path": "/blog/hot",
+      "handler": "queryHotBlog",
+      "source": "src/main/java/com/hmdp/controller/BlogController.java",
+      "line": 47,
+      "access": "anonymous",
+      "live_check": {
+        "url": "/blog/hot",
+        "http_status": 200,
+        "success": true,
+        "error": null,
+        "elapsed_ms": 10.63,
+        "items": 4,
+        "evidence": "public_read"
+      },
+      "coverage_note": "本轮公开 HTTP 成功读取；不等于所有边界场景均已测试"
+    },
+    {
+      "method": "GET",
+      "path": "/blog/of/shop",
+      "handler": "queryBlogByShop",
+      "source": "src/main/java/com/hmdp/controller/BlogController.java",
+      "line": 53,
+      "access": "anonymous",
+      "live_check": {
+        "url": "/blog/of/shop?shopId=1",
+        "http_status": 200,
+        "success": true,
+        "error": null,
+        "elapsed_ms": 7.06,
+        "items": 1,
+        "evidence": "public_read"
+      },
+      "coverage_note": "本轮公开 HTTP 成功读取；不等于所有边界场景均已测试"
+    },
+    {
+      "method": "GET",
+      "path": "/blog/search",
+      "handler": "searchBlogEvidence",
+      "source": "src/main/java/com/hmdp/controller/BlogController.java",
+      "line": 61,
+      "access": "anonymous",
+      "live_check": {
+        "url": "/blog/search?shopId=1&keyword=%E8%8C%B6%E9%A4%90%E5%8E%85&current=1",
+        "http_status": 200,
+        "success": true,
+        "items": 1,
+        "evidence": "public_read"
+      },
+      "negative_check": {
+        "url": "/blog/search?shopId=1&keyword=%E8%8C%B6",
+        "http_status": 200,
+        "success": false,
+        "error": "shopId、keyword 或 current 不合法",
+        "elapsed_ms": 3.18,
+        "evidence": "public_read"
+      },
+      "coverage_note": "本轮公开 HTTP 成功读取；不等于所有边界场景均已测试"
+    },
+    {
+      "method": "GET",
+      "path": "/blog/{id}",
+      "handler": "queryBlogById",
+      "source": "src/main/java/com/hmdp/controller/BlogController.java",
+      "line": 69,
+      "access": "login",
+      "live_check": {
+        "url": "/blog/1",
+        "http_status": 401,
+        "success": false,
+        "error": "请先登录",
+        "elapsed_ms": 3.42,
+        "evidence": "anonymous_denial_only",
+        "expected": 401
+      },
+      "coverage_note": "本轮仅验证匿名 HTTP 401；实现及成功业务路径见相关亮点测试，不能据此认定该接口完整覆盖"
+    },
+    {
+      "method": "GET",
+      "path": "/blog/likes/{id}",
+      "handler": "queryBlogLikes",
+      "source": "src/main/java/com/hmdp/controller/BlogController.java",
+      "line": 74,
+      "access": "login",
+      "live_check": {
+        "url": "/blog/likes/1",
+        "http_status": 401,
+        "success": false,
+        "error": "请先登录",
+        "elapsed_ms": 2.35,
+        "evidence": "anonymous_denial_only",
+        "expected": 401
+      },
+      "coverage_note": "本轮仅验证匿名 HTTP 401；实现及成功业务路径见相关亮点测试，不能据此认定该接口完整覆盖"
+    },
+    {
+      "method": "GET",
+      "path": "/blog/of/user",
+      "handler": "queryBlogByUserId",
+      "source": "src/main/java/com/hmdp/controller/BlogController.java",
+      "line": 79,
+      "access": "login",
+      "live_check": {
+        "url": "/blog/of/user?id=1",
+        "http_status": 401,
+        "success": false,
+        "error": "请先登录",
+        "elapsed_ms": 1.82,
+        "evidence": "anonymous_denial_only",
+        "expected": 401
+      },
+      "coverage_note": "本轮仅验证匿名 HTTP 401；实现及成功业务路径见相关亮点测试，不能据此认定该接口完整覆盖"
+    },
+    {
+      "method": "GET",
+      "path": "/blog/of/follow",
+      "handler": "queryBlogOfFollow",
+      "source": "src/main/java/com/hmdp/controller/BlogController.java",
+      "line": 86,
+      "access": "login",
+      "live_check": {
+        "url": "/blog/of/follow?lastId=1791643591754&offset=0",
+        "http_status": 401,
+        "success": false,
+        "error": "请先登录",
+        "elapsed_ms": 2.86,
+        "evidence": "anonymous_denial_only",
+        "expected": 401
+      },
+      "coverage_note": "本轮仅验证匿名 HTTP 401；实现及成功业务路径见相关亮点测试，不能据此认定该接口完整覆盖"
+    },
+    {
+      "method": "PUT",
+      "path": "/follow/{id}/{isFollow}",
+      "handler": "follow",
+      "source": "src/main/java/com/hmdp/controller/FollowController.java",
+      "line": 23,
+      "access": "login",
+      "live_check": {
+        "url": "/follow/1/true",
+        "http_status": 401,
+        "success": false,
+        "error": "请先登录",
+        "elapsed_ms": 2.01,
+        "evidence": "anonymous_denial_only",
+        "expected": 401
+      },
+      "coverage_note": "本轮仅验证匿名 HTTP 401；实现及成功业务路径见相关亮点测试，不能据此认定该接口完整覆盖"
+    },
+    {
+      "method": "GET",
+      "path": "/follow/or/not/{id}",
+      "handler": "isFollow",
+      "source": "src/main/java/com/hmdp/controller/FollowController.java",
+      "line": 29,
+      "access": "login",
+      "live_check": {
+        "url": "/follow/or/not/1",
+        "http_status": 401,
+        "success": false,
+        "error": "请先登录",
+        "elapsed_ms": 1.59,
+        "evidence": "anonymous_denial_only",
+        "expected": 401
+      },
+      "coverage_note": "本轮仅验证匿名 HTTP 401；实现及成功业务路径见相关亮点测试，不能据此认定该接口完整覆盖"
+    },
+    {
+      "method": "GET",
+      "path": "/follow/common/{id}",
+      "handler": "followCommons",
+      "source": "src/main/java/com/hmdp/controller/FollowController.java",
+      "line": 34,
+      "access": "login",
+      "live_check": {
+        "url": "/follow/common/1",
+        "http_status": 401,
+        "success": false,
+        "error": "请先登录",
+        "elapsed_ms": 2.12,
+        "evidence": "anonymous_denial_only",
+        "expected": 401
+      },
+      "coverage_note": "本轮仅验证匿名 HTTP 401；实现及成功业务路径见相关亮点测试，不能据此认定该接口完整覆盖"
+    },
+    {
+      "method": "GET",
+      "path": "/shop/{id}",
+      "handler": "queryShopById",
+      "source": "src/main/java/com/hmdp/controller/ShopController.java",
+      "line": 34,
+      "access": "anonymous",
+      "live_check": {
+        "url": "/shop/1",
+        "http_status": 200,
+        "success": true,
+        "error": null,
+        "elapsed_ms": 6.9,
+        "evidence": "public_read"
+      },
+      "coverage_note": "本轮公开 HTTP 成功读取；不等于所有边界场景均已测试"
+    },
+    {
+      "method": "GET",
+      "path": "/shop/search",
+      "handler": "searchShops",
+      "source": "src/main/java/com/hmdp/controller/ShopController.java",
+      "line": 40,
+      "access": "anonymous",
+      "live_check": {
+        "url": "/shop/search?typeId=1&page=1&size=2",
+        "http_status": 200,
+        "success": true,
+        "error": null,
+        "elapsed_ms": 19.76,
+        "items": 2,
+        "evidence": "public_read"
+      },
+      "coverage_note": "本轮公开 HTTP 成功读取；不等于所有边界场景均已测试"
+    },
+    {
+      "method": "GET",
+      "path": "/shop/catalog",
+      "handler": "catalog",
+      "source": "src/main/java/com/hmdp/controller/ShopController.java",
+      "line": 46,
+      "access": "anonymous",
+      "live_check": {
+        "url": "/shop/catalog?size=2",
+        "http_status": 200,
+        "success": true,
+        "error": null,
+        "elapsed_ms": 5.44,
+        "items": 2,
+        "evidence": "public_read"
+      },
+      "coverage_note": "本轮公开 HTTP 成功读取；不等于所有边界场景均已测试"
+    },
+    {
+      "method": "GET",
+      "path": "/shop/batch",
+      "handler": "queryShopsByIds",
+      "source": "src/main/java/com/hmdp/controller/ShopController.java",
+      "line": 57,
+      "access": "anonymous",
+      "live_check": {
+        "url": "/shop/batch?ids=1%2C2",
+        "http_status": 200,
+        "success": true,
+        "error": null,
+        "elapsed_ms": 6.27,
+        "items": 2,
+        "evidence": "public_read"
+      },
+      "coverage_note": "本轮公开 HTTP 成功读取；不等于所有边界场景均已测试"
+    },
+    {
+      "method": "GET",
+      "path": "/shop/areas",
+      "handler": "listAreas",
+      "source": "src/main/java/com/hmdp/controller/ShopController.java",
+      "line": 63,
+      "access": "anonymous",
+      "live_check": {
+        "url": "/shop/areas",
+        "http_status": 200,
+        "success": true,
+        "error": null,
+        "elapsed_ms": 11.24,
+        "items": 7,
+        "evidence": "public_read"
+      },
+      "coverage_note": "本轮公开 HTTP 成功读取；不等于所有边界场景均已测试"
+    },
+    {
+      "method": "POST",
+      "path": "/shop",
+      "handler": "saveShop",
+      "source": "src/main/java/com/hmdp/controller/ShopController.java",
+      "line": 74,
+      "access": "admin",
+      "live_check": {
+        "url": "/shop",
+        "http_status": 401,
+        "success": false,
+        "error": "请先登录",
+        "elapsed_ms": 3.24,
+        "evidence": "anonymous_denial_only",
+        "expected": 401
+      },
+      "coverage_note": "本轮仅验证匿名 HTTP 401；实现及成功业务路径见相关亮点测试，不能据此认定该接口完整覆盖"
+    },
+    {
+      "method": "PUT",
+      "path": "/shop",
+      "handler": "updateShop",
+      "source": "src/main/java/com/hmdp/controller/ShopController.java",
+      "line": 85,
+      "access": "admin",
+      "live_check": {
+        "url": "/shop",
+        "http_status": 401,
+        "success": false,
+        "error": "请先登录",
+        "elapsed_ms": 2.6,
+        "evidence": "anonymous_denial_only",
+        "expected": 401
+      },
+      "coverage_note": "本轮仅验证匿名 HTTP 401；实现及成功业务路径见相关亮点测试，不能据此认定该接口完整覆盖"
+    },
+    {
+      "method": "GET",
+      "path": "/shop/of/type",
+      "handler": "queryShopByType",
+      "source": "src/main/java/com/hmdp/controller/ShopController.java",
+      "line": 98,
+      "access": "anonymous",
+      "live_check": {
+        "url": "/shop/of/type?typeId=1&current=1",
+        "http_status": 200,
+        "success": true,
+        "error": null,
+        "elapsed_ms": 6.56,
+        "items": 5,
+        "evidence": "public_read"
+      },
+      "coverage_note": "本轮公开 HTTP 成功读取；不等于所有边界场景均已测试"
+    },
+    {
+      "method": "GET",
+      "path": "/shop/of/name",
+      "handler": "queryShopByName",
+      "source": "src/main/java/com/hmdp/controller/ShopController.java",
+      "line": 114,
+      "access": "anonymous",
+      "live_check": {
+        "url": "/shop/of/name?name=%E8%8C%B6",
+        "http_status": 200,
+        "success": true,
+        "error": null,
+        "elapsed_ms": 6.67,
+        "items": 1,
+        "evidence": "public_read"
+      },
+      "coverage_note": "本轮公开 HTTP 成功读取；不等于所有边界场景均已测试"
+    },
+    {
+      "method": "GET",
+      "path": "/shop-type/list",
+      "handler": "queryTypeList",
+      "source": "src/main/java/com/hmdp/controller/ShopTypeController.java",
+      "line": 20,
+      "access": "anonymous",
+      "live_check": {
+        "url": "/shop-type/list",
+        "http_status": 200,
+        "success": true,
+        "error": null,
+        "elapsed_ms": 3.92,
+        "items": 10,
+        "evidence": "public_read"
+      },
+      "coverage_note": "本轮公开 HTTP 成功读取；不等于所有边界场景均已测试"
+    },
+    {
+      "method": "POST",
+      "path": "/upload/blog",
+      "handler": "uploadImage",
+      "source": "src/main/java/com/hmdp/controller/UploadController.java",
+      "line": 20,
+      "access": "login",
+      "live_check": {
+        "url": "/upload/blog?name=%2Fblogs%2Fnot-present.jpg",
+        "http_status": 401,
+        "success": false,
+        "error": "请先登录",
+        "elapsed_ms": 2.83,
+        "evidence": "anonymous_denial_only",
+        "expected": 401
+      },
+      "coverage_note": "本轮仅验证匿名 HTTP 401；实现及成功业务路径见相关亮点测试，不能据此认定该接口完整覆盖"
+    },
+    {
+      "method": "GET",
+      "path": "/upload/blog/delete",
+      "handler": "deleteBlogImgLegacy",
+      "source": "src/main/java/com/hmdp/controller/UploadController.java",
+      "line": 25,
+      "access": "login",
+      "live_check": {
+        "url": "/upload/blog/delete?name=%2Fblogs%2Fnot-present.jpg",
+        "http_status": 401,
+        "success": false,
+        "error": "请先登录",
+        "elapsed_ms": 2.1,
+        "evidence": "anonymous_denial_only",
+        "expected": 401
+      },
+      "coverage_note": "本轮仅验证匿名 HTTP 401；实现及成功业务路径见相关亮点测试，不能据此认定该接口完整覆盖"
+    },
+    {
+      "method": "DELETE",
+      "path": "/upload/blog",
+      "handler": "deleteBlogImg",
+      "source": "src/main/java/com/hmdp/controller/UploadController.java",
+      "line": 30,
+      "access": "login",
+      "live_check": {
+        "url": "/upload/blog?name=%2Fblogs%2Fnot-present.jpg",
+        "http_status": 401,
+        "success": false,
+        "error": "请先登录",
+        "elapsed_ms": 1.88,
+        "evidence": "anonymous_denial_only",
+        "expected": 401
+      },
+      "coverage_note": "本轮仅验证匿名 HTTP 401；实现及成功业务路径见相关亮点测试，不能据此认定该接口完整覆盖"
+    },
+    {
+      "method": "POST",
+      "path": "/user/code",
+      "handler": "sendCode",
+      "source": "src/main/java/com/hmdp/controller/UserController.java",
+      "line": 36,
+      "access": "anonymous",
+      "live_check": {
+        "url": "/user/code?phone=invalid",
+        "http_status": 200,
+        "success": false,
+        "error": "手机号格式错误！",
+        "elapsed_ms": 26.57,
+        "evidence": "invalid_input_rejection_only"
+      },
+      "coverage_note": "本轮仅提交无效手机号，未发送验证码或登录；核心逻辑另有单元/集成测试"
+    },
+    {
+      "method": "POST",
+      "path": "/user/login",
+      "handler": "login",
+      "source": "src/main/java/com/hmdp/controller/UserController.java",
+      "line": 47,
+      "access": "anonymous",
+      "live_check": {
+        "url": "/user/login",
+        "http_status": 200,
+        "success": false,
+        "error": "手机号格式错误！",
+        "elapsed_ms": 12.04,
+        "evidence": "invalid_input_rejection_only"
+      },
+      "coverage_note": "本轮仅提交无效手机号，未发送验证码或登录；核心逻辑另有单元/集成测试"
+    },
+    {
+      "method": "POST",
+      "path": "/user/logout",
+      "handler": "logout",
+      "source": "src/main/java/com/hmdp/controller/UserController.java",
+      "line": 58,
+      "access": "login",
+      "live_check": {
+        "url": "/user/logout",
+        "http_status": 401,
+        "success": false,
+        "error": "请先登录",
+        "elapsed_ms": 2.52,
+        "evidence": "anonymous_denial_only",
+        "expected": 401
+      },
+      "coverage_note": "本轮仅验证匿名 HTTP 401；实现及成功业务路径见相关亮点测试，不能据此认定该接口完整覆盖"
+    },
+    {
+      "method": "GET",
+      "path": "/user/me",
+      "handler": "me",
+      "source": "src/main/java/com/hmdp/controller/UserController.java",
+      "line": 63,
+      "access": "login",
+      "live_check": {
+        "url": "/user/me",
+        "http_status": 401,
+        "success": false,
+        "error": "请先登录",
+        "elapsed_ms": 2.0,
+        "evidence": "anonymous_denial_only",
+        "expected": 401
+      },
+      "coverage_note": "本轮仅验证匿名 HTTP 401；实现及成功业务路径见相关亮点测试，不能据此认定该接口完整覆盖"
+    },
+    {
+      "method": "GET",
+      "path": "/user/info/{id}",
+      "handler": "info",
+      "source": "src/main/java/com/hmdp/controller/UserController.java",
+      "line": 70,
+      "access": "login",
+      "live_check": {
+        "url": "/user/info/1",
+        "http_status": 401,
+        "success": false,
+        "error": "请先登录",
+        "elapsed_ms": 2.1,
+        "evidence": "anonymous_denial_only",
+        "expected": 401
+      },
+      "coverage_note": "本轮仅验证匿名 HTTP 401；实现及成功业务路径见相关亮点测试，不能据此认定该接口完整覆盖"
+    },
+    {
+      "method": "GET",
+      "path": "/user/{id}",
+      "handler": "queryUserById",
+      "source": "src/main/java/com/hmdp/controller/UserController.java",
+      "line": 75,
+      "access": "login",
+      "live_check": {
+        "url": "/user/1",
+        "http_status": 401,
+        "success": false,
+        "error": "请先登录",
+        "elapsed_ms": 2.69,
+        "evidence": "anonymous_denial_only",
+        "expected": 401
+      },
+      "coverage_note": "本轮仅验证匿名 HTTP 401；实现及成功业务路径见相关亮点测试，不能据此认定该接口完整覆盖"
+    },
+    {
+      "method": "POST",
+      "path": "/user/sign",
+      "handler": "sign",
+      "source": "src/main/java/com/hmdp/controller/UserController.java",
+      "line": 80,
+      "access": "login",
+      "live_check": {
+        "url": "/user/sign",
+        "http_status": 401,
+        "success": false,
+        "error": "请先登录",
+        "elapsed_ms": 1.7,
+        "evidence": "anonymous_denial_only",
+        "expected": 401
+      },
+      "coverage_note": "本轮仅验证匿名 HTTP 401；实现及成功业务路径见相关亮点测试，不能据此认定该接口完整覆盖"
+    },
+    {
+      "method": "GET",
+      "path": "/user/sign/count",
+      "handler": "signCount",
+      "source": "src/main/java/com/hmdp/controller/UserController.java",
+      "line": 85,
+      "access": "login",
+      "live_check": {
+        "url": "/user/sign/count",
+        "http_status": 401,
+        "success": false,
+        "error": "请先登录",
+        "elapsed_ms": 3.12,
+        "evidence": "anonymous_denial_only",
+        "expected": 401
+      },
+      "coverage_note": "本轮仅验证匿名 HTTP 401；实现及成功业务路径见相关亮点测试，不能据此认定该接口完整覆盖"
+    },
+    {
+      "method": "GET",
+      "path": "/voucher/manage/capabilities",
+      "handler": "capabilities",
+      "source": "src/main/java/com/hmdp/controller/VoucherController.java",
+      "line": 25,
+      "access": "anonymous",
+      "live_check": {
+        "url": "/voucher/manage/capabilities",
+        "http_status": 200,
+        "success": true,
+        "error": null,
+        "elapsed_ms": 3.15,
+        "evidence": "public_read"
+      },
+      "coverage_note": "本轮公开 HTTP 成功读取；不等于所有边界场景均已测试"
+    },
+    {
+      "method": "POST",
+      "path": "/voucher/seckill",
+      "handler": "addSeckillVoucher",
+      "source": "src/main/java/com/hmdp/controller/VoucherController.java",
+      "line": 36,
+      "access": "admin",
+      "live_check": {
+        "url": "/voucher/seckill",
+        "http_status": 401,
+        "success": false,
+        "error": "请先登录",
+        "elapsed_ms": 3.46,
+        "evidence": "anonymous_denial_only",
+        "expected": 401
+      },
+      "coverage_note": "本轮仅验证匿名 HTTP 401；实现及成功业务路径见相关亮点测试，不能据此认定该接口完整覆盖"
+    },
+    {
+      "method": "POST",
+      "path": "/voucher",
+      "handler": "addVoucher",
+      "source": "src/main/java/com/hmdp/controller/VoucherController.java",
+      "line": 47,
+      "access": "admin",
+      "live_check": {
+        "url": "/voucher",
+        "http_status": 401,
+        "success": false,
+        "error": "请先登录",
+        "elapsed_ms": 2.36,
+        "evidence": "anonymous_denial_only",
+        "expected": 401
+      },
+      "coverage_note": "本轮仅验证匿名 HTTP 401；实现及成功业务路径见相关亮点测试，不能据此认定该接口完整覆盖"
+    },
+    {
+      "method": "GET",
+      "path": "/voucher/list/{shopId}",
+      "handler": "queryVoucherOfShop",
+      "source": "src/main/java/com/hmdp/controller/VoucherController.java",
+      "line": 58,
+      "access": "anonymous",
+      "live_check": {
+        "url": "/voucher/list/1",
+        "http_status": 200,
+        "success": true,
+        "error": null,
+        "elapsed_ms": 13.3,
+        "items": 1,
+        "evidence": "public_read"
+      },
+      "coverage_note": "本轮公开 HTTP 成功读取；不等于所有边界场景均已测试"
+    },
+    {
+      "method": "GET",
+      "path": "/voucher-order/requests/{id}",
+      "handler": "requestStatus",
+      "source": "src/main/java/com/hmdp/controller/VoucherOrderController.java",
+      "line": 28,
+      "access": "login",
+      "live_check": {
+        "url": "/voucher-order/requests/1",
+        "http_status": 401,
+        "success": false,
+        "error": "请先登录",
+        "elapsed_ms": 3.42,
+        "evidence": "anonymous_denial_only",
+        "expected": 401
+      },
+      "coverage_note": "本轮仅验证匿名 HTTP 401；实现及成功业务路径见相关亮点测试，不能据此认定该接口完整覆盖"
+    },
+    {
+      "method": "GET",
+      "path": "/voucher-order/mine",
+      "handler": "myOrders",
+      "source": "src/main/java/com/hmdp/controller/VoucherOrderController.java",
+      "line": 33,
+      "access": "login",
+      "live_check": {
+        "url": "/voucher-order/mine",
+        "http_status": 401,
+        "success": false,
+        "error": "请先登录",
+        "elapsed_ms": 2.89,
+        "evidence": "anonymous_denial_only",
+        "expected": 401
+      },
+      "coverage_note": "本轮仅验证匿名 HTTP 401；实现及成功业务路径见相关亮点测试，不能据此认定该接口完整覆盖"
+    },
+    {
+      "method": "GET",
+      "path": "/voucher-order/mine/vouchers",
+      "handler": "myVouchers",
+      "source": "src/main/java/com/hmdp/controller/VoucherOrderController.java",
+      "line": 38,
+      "access": "login",
+      "live_check": {
+        "url": "/voucher-order/mine/vouchers",
+        "http_status": 401,
+        "success": false,
+        "error": "请先登录",
+        "elapsed_ms": 2.79,
+        "evidence": "anonymous_denial_only",
+        "expected": 401
+      },
+      "coverage_note": "本轮仅验证匿名 HTTP 401；实现及成功业务路径见相关亮点测试，不能据此认定该接口完整覆盖"
+    },
+    {
+      "method": "POST",
+      "path": "/voucher-order/seckill/{id}",
+      "handler": "seckillVoucher",
+      "source": "src/main/java/com/hmdp/controller/VoucherOrderController.java",
+      "line": 43,
+      "access": "login",
+      "live_check": {
+        "url": "/voucher-order/seckill/1",
+        "http_status": 401,
+        "success": false,
+        "error": "请先登录",
+        "elapsed_ms": 2.48,
+        "evidence": "anonymous_denial_only",
+        "expected": 401
+      },
+      "coverage_note": "本轮仅验证匿名 HTTP 401；实现及成功业务路径见相关亮点测试，不能据此认定该接口完整覆盖"
+    },
+    {
+      "method": "POST",
+      "path": "/voucher-order/ordinary/{id}",
+      "handler": "orderOrdinaryVoucher",
+      "source": "src/main/java/com/hmdp/controller/VoucherOrderController.java",
+      "line": 48,
+      "access": "login",
+      "live_check": {
+        "url": "/voucher-order/ordinary/1",
+        "http_status": 401,
+        "success": false,
+        "error": "请先登录",
+        "elapsed_ms": 1.95,
+        "evidence": "anonymous_denial_only",
+        "expected": 401
+      },
+      "coverage_note": "本轮仅验证匿名 HTTP 401；实现及成功业务路径见相关亮点测试，不能据此认定该接口完整覆盖"
+    },
+    {
+      "method": "POST",
+      "path": "/voucher-order/{id}/pay/mock",
+      "handler": "payMockOrder",
+      "source": "src/main/java/com/hmdp/controller/VoucherOrderController.java",
+      "line": 53,
+      "access": "login",
+      "live_check": {
+        "url": "/voucher-order/1/pay/mock?expectedPayCents=0",
+        "http_status": 401,
+        "success": false,
+        "error": "请先登录",
+        "elapsed_ms": 4.13,
+        "evidence": "anonymous_denial_only",
+        "expected": 401
+      },
+      "coverage_note": "本轮仅验证匿名 HTTP 401；实现及成功业务路径见相关亮点测试，不能据此认定该接口完整覆盖"
+    },
+    {
+      "method": "GET",
+      "path": "/voucher-order/{id}",
+      "handler": "queryMyOrder",
+      "source": "src/main/java/com/hmdp/controller/VoucherOrderController.java",
+      "line": 59,
+      "access": "login",
+      "live_check": {
+        "url": "/voucher-order/1",
+        "http_status": 401,
+        "success": false,
+        "error": "请先登录",
+        "elapsed_ms": 3.55,
+        "evidence": "anonymous_denial_only",
+        "expected": 401
+      },
+      "coverage_note": "本轮仅验证匿名 HTTP 401；实现及成功业务路径见相关亮点测试，不能据此认定该接口完整覆盖"
+    },
+    {
+      "method": "GET",
+      "path": "/voucher-order/of/voucher/{id}",
+      "handler": "queryMyVoucherOrder",
+      "source": "src/main/java/com/hmdp/controller/VoucherOrderController.java",
+      "line": 64,
+      "access": "login",
+      "live_check": {
+        "url": "/voucher-order/of/voucher/1",
+        "http_status": 401,
+        "success": false,
+        "error": "请先登录",
+        "elapsed_ms": 3.3,
+        "evidence": "anonymous_denial_only",
+        "expected": 401
+      },
+      "coverage_note": "本轮仅验证匿名 HTTP 401；实现及成功业务路径见相关亮点测试，不能据此认定该接口完整覆盖"
+    },
+    {
+      "method": "POST",
+      "path": "/voucher-order/{id}/cancel",
+      "handler": "cancelUnpaidOrdinaryOrder",
+      "source": "src/main/java/com/hmdp/controller/VoucherOrderController.java",
+      "line": 69,
+      "access": "login",
+      "live_check": {
+        "url": "/voucher-order/1/cancel",
+        "http_status": 401,
+        "success": false,
+        "error": "请先登录",
+        "elapsed_ms": 3.32,
+        "evidence": "anonymous_denial_only",
+        "expected": 401
+      },
+      "coverage_note": "本轮仅验证匿名 HTTP 401；实现及成功业务路径见相关亮点测试，不能据此认定该接口完整覆盖"
+    },
+    {
+      "method": "GET",
+      "path": "/ops/seckill/tasks",
+      "handler": "tasks",
+      "source": "src/main/java/com/hmdp/reliability/OperationsController.java",
+      "line": 17,
+      "access": "admin",
+      "live_check": {
+        "url": "/ops/seckill/tasks",
+        "http_status": 401,
+        "success": false,
+        "error": "请先登录",
+        "elapsed_ms": 2.23,
+        "evidence": "anonymous_denial_only",
+        "expected": 401
+      },
+      "coverage_note": "本轮仅验证匿名 HTTP 401；实现及成功业务路径见相关亮点测试，不能据此认定该接口完整覆盖"
+    },
+    {
+      "method": "GET",
+      "path": "/ops/seckill/dead-letters",
+      "handler": "deadLetters",
+      "source": "src/main/java/com/hmdp/reliability/OperationsController.java",
+      "line": 22,
+      "access": "admin",
+      "live_check": {
+        "url": "/ops/seckill/dead-letters",
+        "http_status": 401,
+        "success": false,
+        "error": "请先登录",
+        "elapsed_ms": 5.63,
+        "evidence": "anonymous_denial_only",
+        "expected": 401
+      },
+      "coverage_note": "本轮仅验证匿名 HTTP 401；实现及成功业务路径见相关亮点测试，不能据此认定该接口完整覆盖"
+    },
+    {
+      "method": "GET",
+      "path": "/ops/outbox",
+      "handler": "outbox",
+      "source": "src/main/java/com/hmdp/reliability/OperationsController.java",
+      "line": 27,
+      "access": "admin",
+      "live_check": {
+        "url": "/ops/outbox",
+        "http_status": 401,
+        "success": false,
+        "error": "请先登录",
+        "elapsed_ms": 5.2,
+        "evidence": "anonymous_denial_only",
+        "expected": 401
+      },
+      "coverage_note": "本轮仅验证匿名 HTTP 401；实现及成功业务路径见相关亮点测试，不能据此认定该接口完整覆盖"
+    },
+    {
+      "method": "POST",
+      "path": "/ops/outbox/{id}/retry",
+      "handler": "retryOutbox",
+      "source": "src/main/java/com/hmdp/reliability/OperationsController.java",
+      "line": 32,
+      "access": "admin",
+      "live_check": {
+        "url": "/ops/outbox/1/retry",
+        "http_status": 401,
+        "success": false,
+        "error": "请先登录",
+        "elapsed_ms": 2.56,
+        "evidence": "anonymous_denial_only",
+        "expected": 401
+      },
+      "coverage_note": "本轮仅验证匿名 HTTP 401；实现及成功业务路径见相关亮点测试，不能据此认定该接口完整覆盖"
+    },
+    {
+      "method": "GET",
+      "path": "/ops/messages/failures",
+      "handler": "messageFailures",
+      "source": "src/main/java/com/hmdp/reliability/OperationsController.java",
+      "line": 37,
+      "access": "admin",
+      "live_check": {
+        "url": "/ops/messages/failures",
+        "http_status": 401,
+        "success": false,
+        "error": "请先登录",
+        "elapsed_ms": 2.55,
+        "evidence": "anonymous_denial_only",
+        "expected": 401
+      },
+      "coverage_note": "本轮仅验证匿名 HTTP 401；实现及成功业务路径见相关亮点测试，不能据此认定该接口完整覆盖"
+    },
+    {
+      "method": "GET",
+      "path": "/ops/analytics/outbox",
+      "handler": "analyticsOutbox",
+      "source": "src/main/java/com/hmdp/reliability/OperationsController.java",
+      "line": 42,
+      "access": "admin",
+      "live_check": {
+        "url": "/ops/analytics/outbox",
+        "http_status": 401,
+        "success": false,
+        "error": "请先登录",
+        "elapsed_ms": 3.92,
+        "evidence": "anonymous_denial_only",
+        "expected": 401
+      },
+      "coverage_note": "本轮仅验证匿名 HTTP 401；实现及成功业务路径见相关亮点测试，不能据此认定该接口完整覆盖"
+    },
+    {
+      "method": "GET",
+      "path": "/ops/analytics/failures",
+      "handler": "analyticsFailures",
+      "source": "src/main/java/com/hmdp/reliability/OperationsController.java",
+      "line": 47,
+      "access": "admin",
+      "live_check": {
+        "url": "/ops/analytics/failures",
+        "http_status": 401,
+        "success": false,
+        "error": "请先登录",
+        "elapsed_ms": 2.42,
+        "evidence": "anonymous_denial_only",
+        "expected": 401
+      },
+      "coverage_note": "本轮仅验证匿名 HTTP 401；实现及成功业务路径见相关亮点测试，不能据此认定该接口完整覆盖"
+    },
+    {
+      "method": "POST",
+      "path": "/ops/analytics/outbox/{eventId}/retry",
+      "handler": "retryAnalytics",
+      "source": "src/main/java/com/hmdp/reliability/OperationsController.java",
+      "line": 52,
+      "access": "admin",
+      "live_check": {
+        "url": "/ops/analytics/outbox/1/retry",
+        "http_status": 401,
+        "success": false,
+        "error": "请先登录",
+        "elapsed_ms": 2.62,
+        "evidence": "anonymous_denial_only",
+        "expected": 401
+      },
+      "coverage_note": "本轮仅验证匿名 HTTP 401；实现及成功业务路径见相关亮点测试，不能据此认定该接口完整覆盖"
+    },
+    {
+      "method": "GET",
+      "path": "/ops/seckill/{id}/reconcile",
+      "handler": "reconcile",
+      "source": "src/main/java/com/hmdp/reliability/OperationsController.java",
+      "line": 57,
+      "access": "admin",
+      "live_check": {
+        "url": "/ops/seckill/1/reconcile",
+        "http_status": 401,
+        "success": false,
+        "error": "请先登录",
+        "elapsed_ms": 3.66,
+        "evidence": "anonymous_denial_only",
+        "expected": 401
+      },
+      "coverage_note": "本轮仅验证匿名 HTTP 401；实现及成功业务路径见相关亮点测试，不能据此认定该接口完整覆盖"
+    },
+    {
+      "method": "POST",
+      "path": "/ops/seckill/{id}/publish",
+      "handler": "publish",
+      "source": "src/main/java/com/hmdp/reliability/OperationsController.java",
+      "line": 62,
+      "access": "admin",
+      "live_check": {
+        "url": "/ops/seckill/1/publish",
+        "http_status": 401,
+        "success": false,
+        "error": "请先登录",
+        "elapsed_ms": 2.08,
+        "evidence": "anonymous_denial_only",
+        "expected": 401
+      },
+      "coverage_note": "本轮仅验证匿名 HTTP 401；实现及成功业务路径见相关亮点测试，不能据此认定该接口完整覆盖"
+    },
+    {
+      "method": "POST",
+      "path": "/ops/seckill/{id}/recover",
+      "handler": "recover",
+      "source": "src/main/java/com/hmdp/reliability/OperationsController.java",
+      "line": 67,
+      "access": "admin",
+      "live_check": {
+        "url": "/ops/seckill/1/recover",
+        "http_status": 401,
+        "success": false,
+        "error": "请先登录",
+        "elapsed_ms": 2.83,
+        "evidence": "anonymous_denial_only",
+        "expected": 401
+      },
+      "coverage_note": "本轮仅验证匿名 HTTP 401；实现及成功业务路径见相关亮点测试，不能据此认定该接口完整覆盖"
+    },
+    {
+      "method": "POST",
+      "path": "/ops/seckill/requests/{id}/retry",
+      "handler": "retry",
+      "source": "src/main/java/com/hmdp/reliability/OperationsController.java",
+      "line": 72,
+      "access": "admin",
+      "live_check": {
+        "url": "/ops/seckill/requests/1/retry",
+        "http_status": 401,
+        "success": false,
+        "error": "请先登录",
+        "elapsed_ms": 2.37,
+        "evidence": "anonymous_denial_only",
+        "expected": 401
+      },
+      "coverage_note": "本轮仅验证匿名 HTTP 401；实现及成功业务路径见相关亮点测试，不能据此认定该接口完整覆盖"
+    },
+    {
+      "method": "POST",
+      "path": "/ops/seckill/requests/{id}/fail",
+      "handler": "fail",
+      "source": "src/main/java/com/hmdp/reliability/OperationsController.java",
+      "line": 77,
+      "access": "admin",
+      "live_check": {
+        "url": "/ops/seckill/requests/1/fail",
+        "http_status": 401,
+        "success": false,
+        "error": "请先登录",
+        "elapsed_ms": 2.96,
+        "evidence": "anonymous_denial_only",
+        "expected": 401
+      },
+      "coverage_note": "本轮仅验证匿名 HTTP 401；实现及成功业务路径见相关亮点测试，不能据此认定该接口完整覆盖"
+    },
+    {
+      "method": "GET",
+      "path": "/shop/hot-ranking",
+      "handler": "ranking",
+      "source": "src/main/java/com/hmdp/analytics/ShopHeatController.java",
+      "line": 16,
+      "access": "anonymous",
+      "live_check": {
+        "url": "/shop/hot-ranking?windowMinutes=60&limit=3",
+        "http_status": 200,
+        "success": true,
+        "error": null,
+        "elapsed_ms": 3.97,
+        "items": 1,
+        "evidence": "public_read"
+      },
+      "coverage_note": "本轮公开 HTTP 成功读取；不等于所有边界场景均已测试"
+    },
+    {
+      "method": "GET",
+      "path": "/actuator/health",
+      "handler": "Spring Boot Actuator",
+      "access": "anonymous",
+      "live_check": {
+        "url": "/actuator/health",
+        "http_status": 200,
+        "success": null,
+        "error": null,
+        "elapsed_ms": 6.61,
+        "health": "UP",
+        "evidence": "public_health"
+      },
+      "coverage_note": "本轮公开健康检查返回 UP"
+    },
+    {
+      "method": "GET",
+      "path": "/actuator/prometheus",
+      "handler": "Spring Boot Actuator",
+      "access": "admin_or_monitor_credential",
+      "live_check": {
+        "url": "/actuator/prometheus",
+        "http_status": 401,
+        "success": false,
+        "error": "请先登录",
+        "elapsed_ms": 5.02,
+        "evidence": "anonymous_denial_only",
+        "expected": 401
+      },
+      "coverage_note": "本轮仅验证匿名 HTTP 401；实现及成功业务路径见相关亮点测试，不能据此认定该接口完整覆盖"
+    }
+  ],
+  "evidence_files": {
+    "initial_build": "backend-audit-build.log",
+    "functional_tests": "backend-audit-tests.log",
+    "benchmark": "backend-audit-benchmark.json"
+  },
+  "reproduction": {
+    "working_directory": "/path/to/user/Desktop/code/黑马点评/点评/hm-dianping",
+    "start_isolated_dependencies": "docker compose -p hmdp-optimization-test -f dev/docker-compose.test.yml up -d mysql redis memcached canal mq-init kafka-init",
+    "standard_test_command": "docker compose -p hmdp-optimization-test -f dev/docker-compose.test.yml run --no-deps --rm test",
+    "standard_test_status": "本次被 Checkstyle 的 15 处违规拦截，业务测试未开始",
+    "functional_test_command": "docker compose -p hmdp-optimization-test -f dev/docker-compose.test.yml run --no-deps --rm test mvn -B -Dcheckstyle.skip=true -DargLine=-Xmx512m -Dspring.test.context.cache.maxSize=2 -Dtest=CacheLayersIntegrationTest,CanalBatchTest,RequestCacheScopeTest,CacheBenchmarkIntegrationTest,CacheChangeProjectorTest,CacheCdcIntegrationTest,UserLogoutTest,ShopCacheCompatibilityTest,ReliabilityIntegrationTest,SeckillMessageTest,LoginCodeTest,CacheConcurrencyTest,AccessGuardTest,MapperArchitectureTest,VoucherOrderReliabilityTest,MockPaymentTest,ShopSearchBoundaryTest,MessagingIntegrationTest,RocketMqIntegrationTest,KafkaBehaviorIntegrationTest,BehaviorAggregationIntegrationTest test",
+    "functional_test_status": "77 项功能测试通过；仅本次命令跳过 Checkstyle",
+    "cleanup": "docker compose -p hmdp-optimization-test -f dev/docker-compose.test.yml down -v",
+    "isolation": "仅限独立 hmdp_optimization_test 库；不可把此 Compose 改连业务库。外部 Maven 缓存保留。"
+  },
+  "publication_note": "2026-10-30: personal paths and deployment host replaced with documentation examples; historical outcomes retained."
+}

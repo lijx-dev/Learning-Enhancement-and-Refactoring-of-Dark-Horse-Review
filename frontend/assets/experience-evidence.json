@@ -1,0 +1,290 @@
+{
+  "generatedAt": "2026-10-10T15:13:58.466556+00:00",
+  "scope": "隔离数据库 hmdp_optimization_test，完整回归命令一次通过；不等同于访客点击页面运行全部测试",
+  "tests": 90,
+  "failures": 0,
+  "errors": 0,
+  "suites": [
+    {
+      "name": "com.hmdp.MapperArchitectureTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.hmdp.MockPaymentTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.hmdp.ShopCacheCompatibilityTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.hmdp.ShopSearchBoundaryTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.hmdp.UserLogoutTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.hmdp.VoucherOrderReliabilityTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.hmdp.analytics.BehaviorAggregationIntegrationTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.hmdp.analytics.KafkaBehaviorIntegrationTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.hmdp.cache.CacheBenchmarkIntegrationTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.hmdp.cache.CacheCdcIntegrationTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.hmdp.cache.CacheChangeProjectorTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.hmdp.cache.CacheLayersIntegrationTest",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.hmdp.cache.CacheReadTraceTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.hmdp.cache.CanalBatchTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.hmdp.cache.RequestCacheScopeTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.hmdp.experience.ExperienceIntegrationTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.hmdp.experience.ExperienceServiceTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.hmdp.messaging.MessagingIntegrationTest",
+      "tests": 13,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.hmdp.messaging.RocketMqIntegrationTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.hmdp.reliability.AccessGuardTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.hmdp.reliability.CacheConcurrencyTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.hmdp.reliability.LoginCodeTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.hmdp.reliability.ReliabilityIntegrationTest",
+      "tests": 19,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.hmdp.reliability.SeckillMessageTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  ],
+  "features": [
+    {
+      "feature": "请求内缓存、LoadingCache、Memcache、版本命名空间和回填",
+      "tests": [
+        "RequestCacheScopeTest",
+        "CacheLayersIntegrationTest",
+        "CacheChangeProjectorTest"
+      ],
+      "boundary": "同一 JVM 内独立 CacheClient 与并发线程；未部署多个 Java 节点做故障演练"
+    },
+    {
+      "feature": "空值缓存、互斥重建、旧回填隔离、TTL、Memcache 故障回退",
+      "tests": [
+        "CacheLayersIntegrationTest",
+        "CacheConcurrencyTest",
+        "ShopCacheCompatibilityTest",
+        "ReliabilityIntegrationTest"
+      ],
+      "boundary": "未实测 Redis Cluster、主从切换或持续缓存雪崩负载"
+    },
+    {
+      "feature": "Canal 外部 SQL 变更、删除、券换店、重连、成功后 ACK",
+      "tests": [
+        "CacheCdcIntegrationTest",
+        "CanalBatchTest",
+        "CacheChangeProjectorTest"
+      ],
+      "boundary": "真实单实例 Canal/MySQL；未测长时间 binlog 过期或集群切换"
+    },
+    {
+      "feature": "Lua 抢购、最后库存并发竞争、重复下单、事务与资格唯一约束",
+      "tests": ["ReliabilityIntegrationTest", "VoucherOrderReliabilityTest"],
+      "boundary": "测试直接调用 Service；不是 HTTP 秒杀容量压测"
+    },
+    {
+      "feature": "Stream pending 接管、毒消息隔离、状态、补偿、恢复和对账",
+      "tests": ["ReliabilityIntegrationTest", "SeckillMessageTest"],
+      "boundary": "相关管理 HTTP 成功路径尚未系统覆盖；当前应用无管理员白名单"
+    },
+    {
+      "feature": "Outbox、Inbox 幂等、发送确认丢失、消费先完成、租约恢复",
+      "tests": ["MessagingIntegrationTest", "RocketMqIntegrationTest"],
+      "boundary": "可控故障与真实单 Broker；未测宿主机断电或多副本切换"
+    },
+    {
+      "feature": "RocketMQ 秒杀履约、重复投递、延迟关单与支付竞态",
+      "tests": ["RocketMqIntegrationTest", "MessagingIntegrationTest"],
+      "boundary": "3 项真实 Broker 测试；支付为本地模拟，当前业务环境关闭模拟支付"
+    },
+    {
+      "feature": "Kafka 浏览采集、交易 Outbox、PV/UV 窗口与去重",
+      "tests": [
+        "KafkaBehaviorIntegrationTest",
+        "BehaviorAggregationIntegrationTest"
+      ],
+      "boundary": "2 项真实 Broker 测试；浏览采集允许丢失，不宣称跨存储 Exactly Once"
+    },
+    {
+      "feature": "普通券防重、取消重下、订单快照、超时关闭",
+      "tests": [
+        "ReliabilityIntegrationTest",
+        "MessagingIntegrationTest",
+        "MockPaymentTest",
+        "VoucherOrderReliabilityTest"
+      ],
+      "boundary": "HTTP 登录下单查单完整闭环尚未系统覆盖；无真实支付、退款、核销"
+    },
+    {
+      "feature": "点赞关注幂等、Feed 分发、图片归属、删除发布竞态与重试",
+      "tests": ["ReliabilityIntegrationTest", "UserLogoutTest"],
+      "boundary": "部分测 Controller/Service，未覆盖所有 HTTP 绑定、分页和错误输入"
+    },
+    {
+      "feature": "登录验证码限流与一次性消费、鉴权、监控凭证、管理员隔离",
+      "tests": [
+        "LoginCodeTest",
+        "AccessGuardTest",
+        "CacheLayersIntegrationTest",
+        "ReliabilityIntegrationTest"
+      ],
+      "boundary": "真实短信不在范围；签到与连续签到缺少专门自动断言"
+    },
+    {
+      "feature": "搜索数据库分页、边界与 Mapper 分层",
+      "tests": [
+        "ShopSearchBoundaryTest",
+        "ReliabilityIntegrationTest",
+        "MapperArchitectureTest"
+      ],
+      "boundary": "catalog/batch/areas 当前公开读取成功；新增创建与修改 HTTP 场景仍需补齐"
+    },
+    {
+      "feature": "缓存 HTTP 基线对照",
+      "tests": ["CacheBenchmarkIntegrationTest"],
+      "boundary": "单实例热 key、8 并发、每阶段 10000 次；不能用来宣称秒杀或生产容量"
+    },
+    {
+      "feature": "Prometheus 指标与 18 条告警规则",
+      "tests": ["CacheLayersIntegrationTest", "AccessGuardTest"],
+      "boundary": "targets up、规则 health=ok；未触发全部告警或验证外部通知"
+    }
+  ],
+  "limitations": [
+    "BlogCommentsController 为空，无评论处理接口",
+    "真实支付与退款",
+    "真实短信发送",
+    "Token 包、额度账本和权益账户迁移",
+    "Redis Cluster 同槽改造及高可用演练"
+  ],
+  "checkstyleSkipped": false,
+  "skipped": 0,
+  "checkstylePassed": true,
+  "frontendTests": 12
+}

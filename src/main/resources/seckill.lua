@@ -1,32 +1,24 @@
--- 1.参数列表
--- 1.1.优惠券id
-local voucherId = ARGV[1]
--- 1.2.用户id
-local userId = ARGV[2]
--- 1.3.订单id
-local orderId = ARGV[3]
-
--- 2.数据key
--- 2.1.库存key
-local stockKey = 'seckill:stock:' .. voucherId
--- 2.2.订单key
-local orderKey = 'seckill:order:' .. voucherId
-
--- 3.脚本业务
--- 3.1.判断库存是否充足 get stockKey
-if(tonumber(redis.call('get', stockKey)) <= 0) then
-    -- 3.2.库存不足，返回1
-    return 1
+-- All accessed keys are explicit. This deployment uses a single Redis instance.
+-- KEYS: stock, buyers(set), stream, activity(hash), user->order(hash), request(hash).
+local types={'string','set','stream','hash','hash','hash'}
+for i=1,6 do
+  local t=redis.call('TYPE',KEYS[i]).ok
+  if t~='none' and t~=types[i] then return 4 end
 end
--- 3.2.判断用户是否下单 SISMEMBER orderKey userId
-if(redis.call('sismember', orderKey, userId) == 1) then
-    -- 3.3.存在，说明是重复下单，返回2
-    return 2
-end
--- 3.4.扣库存 incrby stockKey -1
-redis.call('incrby', stockKey, -1)
--- 3.5.下单（保存用户）sadd orderKey userId
-redis.call('sadd', orderKey, userId)
--- 3.6.发送消息到队列中， XADD stream.orders * k1 v1 k2 v2 ...
-redis.call('xadd', 'stream.orders', '*', 'userId', userId, 'voucherId', voucherId, 'id', orderId)
+local stock=tonumber(redis.call('GET',KEYS[1]))
+local start=tonumber(redis.call('HGET',KEYS[4],'begin'))
+local finish=tonumber(redis.call('HGET',KEYS[4],'end'))
+if not stock or not start or not finish or redis.call('HGET',KEYS[4],'state')~='ACTIVE' then return 3 end
+local clock=redis.call('TIME')
+local now=tonumber(clock[1])*1000+math.floor(tonumber(clock[2])/1000)
+if now<start or now>finish then return 3 end
+-- Duplicate status remains queryable even after inventory is sold out.
+if redis.call('SISMEMBER',KEYS[2],ARGV[2])==1 then return 2 end
+if stock<=0 then return 1 end
+redis.call('DECR',KEYS[1])
+redis.call('SADD',KEYS[2],ARGV[2])
+redis.call('HSET',KEYS[5],ARGV[2],ARGV[3])
+redis.call('HSET',KEYS[6],'orderId',ARGV[3],'userId',ARGV[2],'voucherId',ARGV[1],'state','PROCESSING')
+redis.call('EXPIRE',KEYS[6],604800)
+redis.call('XADD',KEYS[3],'*','userId',ARGV[2],'voucherId',ARGV[1],'id',ARGV[3])
 return 0
