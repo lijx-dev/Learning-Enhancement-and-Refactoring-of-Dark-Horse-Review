@@ -1,0 +1,21 @@
+{
+  "contract_version": "hmdp-offline-v1",
+  "business_timezone": "Asia/Shanghai",
+  "timestamp_storage": "UTC_ISO8601",
+  "id_encoding": "decimal_string",
+  "amount_encoding": "integer_cents",
+  "source_tables": {
+    "tb_shop": ["id", "name", "type_id", "area", "address", "avg_price", "sold", "comments", "score", "create_time", "update_time"],
+    "tb_shop_type": ["id", "name", "sort", "create_time", "update_time"],
+    "tb_voucher": ["id", "shop_id", "title", "rules", "pay_value", "actual_value", "type", "status", "create_time", "update_time"],
+    "tb_voucher_order": ["id", "user_id", "voucher_id", "status", "create_time", "pay_time", "use_time", "refund_time", "update_time", "pay_value_snapshot", "shop_id_snapshot", "title_snapshot", "rules_snapshot", "voucher_type_snapshot", "expire_at"],
+    "tb_order_event_history": ["event_id", "order_id", "event_type", "occurred_at", "processed_at"],
+    "tb_business_outbox": ["id", "kind", "aggregate_id", "user_id", "state", "created_at", "consumed_at"]
+  },
+  "rules": {
+    "snapshot_as_of_is_required": true,
+    "missing_amount_is_unknown": true,
+    "status_paid_is_not_revenue": true,
+    "order_event_history_is_append_only": true
+  }
+}

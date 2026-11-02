@@ -1,0 +1,2 @@
+-r requirements-extract.txt
+pyarrow==24.0.0

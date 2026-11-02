@@ -1,0 +1,158 @@
+name: hmdp-local
+
+x-java: &java
+  image: maven:3.9-eclipse-temurin-8
+  working_dir: /workspace
+  mem_limit: 1536m
+  cpus: 2
+  environment: &java-env
+    MAVEN_OPTS: '-Xms128m -Xmx512m'
+  volumes:
+    - ../..:/workspace
+    - maven-cache:/root/.m2
+
+x-app-env: &app-env
+  TZ: Asia/Shanghai
+  SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/hmdp?useSSL=false&serverTimezone=Asia/Shanghai&characterEncoding=utf8
+  SPRING_DATASOURCE_USERNAME: root
+  SPRING_DATASOURCE_PASSWORD: local_demo_only
+  SPRING_REDIS_HOST: redis
+  SPRING_REDIS_PASSWORD: ''
+  HMDP_UPLOAD_DIR: /uploads
+  HMDP_EXPERIENCE_ENABLED: 'true'
+  HMDP_MEMCACHE_ENABLED: 'false'
+  HMDP_CDC_ENABLED: 'false'
+  HMDP_MQ_ENABLED: 'false'
+  HMDP_MQ_SECKILL_ENABLED: 'false'
+  HMDP_ANALYTICS_ENABLED: 'false'
+
+services:
+  mysql:
+    image: mysql:8.0
+    mem_limit: 512m
+    cpus: 1
+    command: [--default-authentication-plugin=mysql_native_password, '--default-time-zone=+08:00', --sql-mode=NO_ENGINE_SUBSTITUTION, --innodb-buffer-pool-size=64M, --max-connections=40, --performance-schema=OFF]
+    environment:
+      MYSQL_ROOT_PASSWORD: local_demo_only
+      MYSQL_DATABASE: hmdp
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ../../src/main/resources/db/hmdp.sql:/docker-entrypoint-initdb.d/01-hmdp.sql:ro
+      - ./02-warehouse-reader.sql:/docker-entrypoint-initdb.d/02-warehouse-reader.sql:ro
+    ports:
+      - '127.0.0.1:13306:3306'
+    healthcheck:
+      test: [CMD-SHELL, 'MYSQL_PWD="$$MYSQL_ROOT_PASSWORD" mysqladmin ping -h 127.0.0.1 --silent']
+      interval: 5s
+      timeout: 3s
+      retries: 60
+  redis:
+    image: redis:7-alpine
+    mem_limit: 128m
+    command: [redis-server, --appendonly, 'yes', --maxmemory, 64mb, --maxmemory-policy, noeviction]
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: [CMD, redis-cli, ping]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+  build:
+    <<: *java
+    profiles: [tools]
+    command: [mvn, -B, '-Dtest=MapperArchitectureTest,CacheReadTraceTest,RequestCacheScopeTest,CanalBatchTest,CacheChangeProjectorTest,SeckillMessageTest,ExperienceServiceTest', package]
+  app:
+    <<: *java
+    mem_limit: 768m
+    environment:
+      <<: *app-env
+      JAVA_TOOL_OPTIONS: '-Xms128m -Xmx384m -XX:MaxDirectMemorySize=64m -Duser.timezone=Asia/Shanghai'
+    command: [java, -jar, target/hm-dianping-0.0.1-SNAPSHOT.jar]
+    volumes:
+      - ../..:/workspace
+      - uploads:/uploads
+    ports:
+      - '127.0.0.1:18081:8081'
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+  web:
+    image: nginx:alpine
+    mem_limit: 64m
+    ports:
+      - '127.0.0.1:18080:80'
+    volumes:
+      - ../../frontend:/usr/share/nginx/html:ro
+      - uploads:/usr/share/nginx/hmdp-images:ro
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - app
+  mysql-test:
+    image: mysql:8.0
+    profiles: [test]
+    mem_limit: 512m
+    command: [--default-authentication-plugin=mysql_native_password, '--default-time-zone=+08:00', --sql-mode=NO_ENGINE_SUBSTITUTION, --innodb-buffer-pool-size=64M, --performance-schema=OFF]
+    environment:
+      MYSQL_ROOT_PASSWORD: isolated_test_only
+      MYSQL_DATABASE: hmdp_optimization_test
+    volumes:
+      - mysql-test-data:/var/lib/mysql
+      - ../../src/main/resources/db/hmdp.sql:/docker-entrypoint-initdb.d/01-hmdp.sql:ro
+    healthcheck:
+      test: [CMD-SHELL, 'MYSQL_PWD="$$MYSQL_ROOT_PASSWORD" mysqladmin ping -h 127.0.0.1 --silent']
+      interval: 5s
+      timeout: 3s
+      retries: 60
+  redis-test:
+    image: redis:7-alpine
+    profiles: [test]
+    mem_limit: 128m
+    healthcheck:
+      test: [CMD, redis-cli, ping]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+  test:
+    <<: *java
+    profiles: [test]
+    environment:
+      <<: [*java-env, *app-env]
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-test:3306/hmdp_optimization_test?useSSL=false&serverTimezone=Asia/Shanghai&characterEncoding=utf8
+      SPRING_DATASOURCE_PASSWORD: isolated_test_only
+      SPRING_REDIS_HOST: redis-test
+      CITYLENS_CATALOG_ADMIN_IDS: '1010'
+      CITYLENS_PAYMENT_MOCK_ENABLED: 'true'
+      CITYLENS_RELIABILITY_SCHEDULING_ENABLED: 'false'
+    # 无 broker 子集：Kafka/RocketMQ 相关用例只在 dev/docker-compose.test.yml 完整栈中执行。
+    command: [mvn, -B, '-DargLine=-Xmx512m', '-Dspring.test.context.cache.maxSize=2', '-Dtest=MapperArchitectureTest,CacheReadTraceTest,RequestCacheScopeTest,CanalBatchTest,CacheChangeProjectorTest,SeckillMessageTest,ExperienceServiceTest,BehaviorAggregationIntegrationTest,ReliabilityIntegrationTest,MessagingIntegrationTest,AccessGuardTest,LoginCodeTest,CacheConcurrencyTest,VoucherOrderReliabilityTest,ShopCacheCompatibilityTest,ShopSearchBoundaryTest,MockPaymentTest,UserLogoutTest', test]
+    depends_on:
+      mysql-test:
+        condition: service_healthy
+      redis-test:
+        condition: service_healthy
+  spark:
+    image: apache/spark:3.5.7-scala2.12-java17-python3-ubuntu
+    profiles: [warehouse]
+    user: '0:0'
+    working_dir: /workspace
+    mem_limit: 2048m
+    cpus: 2
+    environment:
+      SPARK_LOCAL_IP: 127.0.0.1
+      PYSPARK_PYTHON: python3
+      TZ: Asia/Shanghai
+      JAVA_TOOL_OPTIONS: '-Duser.timezone=Asia/Shanghai'
+    entrypoint: [/opt/spark/bin/spark-submit]
+    command: [--master, 'local[2]', --driver-memory, 768m, --conf, spark.sql.shuffle.partitions=2, --jars, /maven/repository/mysql/mysql-connector-java/5.1.47/mysql-connector-java-5.1.47.jar, /workspace/dev/local/spark_smoke.py]
+    volumes:
+      - ../..:/workspace
+      - maven-cache:/maven:ro
+
+volumes:
+  mysql-data:
+  redis-data:
+  mysql-test-data:
+  maven-cache:
+  uploads:

@@ -6,6 +6,8 @@
 | --- | --- |
 | [仓库整理记录](仓库整理记录.md) | 2026-10-30 的目录、配置、交付修改与实际验证范围 |
 | [数据开发方向评估与路线](数据开发方向评估与路线.md) | 对照当前源码的差距、优先级、技术取舍和交付标准；规划尚未实现 |
+| [离线数仓模块](../data-platform/README.md) | 只读抽取、分层模型、质量门禁、版本发布及本地复现命令 |
+| [可手算业务样本](../data-platform/fixtures/hand-calculable/README.md) | 14笔合成订单、3个模拟截点、人工答案与SQLite/MySQL/Spark对账 |
 | [体验验证报告](experience-verification.json) | 历史 Java/前端验证与页面验收摘要 |
 | [缓存性能记录](cache-benchmark.json) | 固定热点与单机条件下的历史结果，不能代表全站容量 |
 | [后端审阅](backend-audit.json) | 历史审阅发现、处理方式和验证摘要 |
