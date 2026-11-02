@@ -1,0 +1,753 @@
+{
+  "tag": "perf-20261102-v2",
+  "started_at_utc": "2026-11-02T03:39:33.880231+00:00",
+  "completed_at_utc": "2026-11-02T03:48:53.661368+00:00",
+  "python": "3.11.3",
+  "host": "Windows-10-10.0.26200-SP0",
+  "docker": "29.3.1 CPUs=16 Memory=7898071040",
+  "image_id": "sha256:7897b9a69efa94caccc52579e310a2fe68fb75b88a3d55b97b31568e5e233176",
+  "seed": 42,
+  "biz_date": "2026-10-30",
+  "limits": {
+    "container_memory_bytes": 2147483648,
+    "container_cpus": 2,
+    "driver_memory": "768m",
+    "master": "local[2]",
+    "main_runs_per_policy_per_size": 1,
+    "cold_cache": "OS/Docker caches not dropped; main timings are observations, not statistical speedup estimates"
+  },
+  "source_hashes": {
+    "10000": "7c58eab2e66288e39d2c9439cca01d9567e12b112956e0fca322cbed29302aa9",
+    "100000": "3484bb6cdb4354004ee5593c4e14e2570a905711eb97f9ac72741cbd41fa54d7"
+  },
+  "all_model_cache_equivalence": {
+    "10000": true,
+    "100000": true
+  },
+  "raw_report_sha256": "4e330550d41964b50fad81faaa0b3f31058ae23f922ac742da079002f31717a2",
+  "exported_at_utc": "2026-11-02T03:53:04.143017+00:00",
+  "runs": [
+    {
+      "size": 10000,
+      "policy": "none",
+      "process_wall_seconds": 53.66246789996512,
+      "execution": {
+        "source_and_model_setup_seconds": 6.141044760999648,
+        "quality_seconds": 14.411381298000379,
+        "output_seconds": 24.666925699000785,
+        "spark_work_seconds": 45.219358702000136,
+        "cache_policy": "none",
+        "spark_conf": {
+          "spark.sql.shuffle.partitions": "2",
+          "spark.sql.adaptive.enabled": "true",
+          "spark.sql.autoBroadcastJoinThreshold": "10485760b"
+        },
+        "master": "local[2]",
+        "driver_memory": "768m"
+      },
+      "independent_verification": {
+        "passed": true,
+        "run_id": "perf-20261102-v2-n10000-none",
+        "orders": 10000,
+        "events": 17913,
+        "known_cents": "25326225",
+        "dws_rows": 90,
+        "cohort_rows": 145,
+        "biz_date": "2026-10-30"
+      }
+    },
+    {
+      "size": 10000,
+      "policy": "memory-and-disk",
+      "process_wall_seconds": 45.21265199990012,
+      "execution": {
+        "source_and_model_setup_seconds": 6.399455611999656,
+        "quality_seconds": 10.582093087999965,
+        "output_seconds": 19.933981117999792,
+        "spark_work_seconds": 36.9155365710003,
+        "cache_policy": "memory-and-disk",
+        "spark_conf": {
+          "spark.sql.shuffle.partitions": "2",
+          "spark.sql.adaptive.enabled": "true",
+          "spark.sql.autoBroadcastJoinThreshold": "10485760b"
+        },
+        "master": "local[2]",
+        "driver_memory": "768m"
+      },
+      "independent_verification": {
+        "passed": true,
+        "run_id": "perf-20261102-v2-n10000-memory-and-disk",
+        "orders": 10000,
+        "events": 17913,
+        "known_cents": "25326225",
+        "dws_rows": 90,
+        "cohort_rows": 145,
+        "biz_date": "2026-10-30"
+      }
+    },
+    {
+      "size": 100000,
+      "policy": "memory-and-disk",
+      "process_wall_seconds": 68.53058100002818,
+      "execution": {
+        "source_and_model_setup_seconds": 9.660734291000153,
+        "quality_seconds": 14.657264082000438,
+        "output_seconds": 20.560193946000254,
+        "spark_work_seconds": 44.878198952000275,
+        "cache_policy": "memory-and-disk",
+        "spark_conf": {
+          "spark.sql.shuffle.partitions": "2",
+          "spark.sql.adaptive.enabled": "true",
+          "spark.sql.autoBroadcastJoinThreshold": "10485760b"
+        },
+        "master": "local[2]",
+        "driver_memory": "768m"
+      },
+      "independent_verification": {
+        "passed": true,
+        "run_id": "perf-20261102-v2-n100000-memory-and-disk",
+        "orders": 100000,
+        "events": 179112,
+        "known_cents": "253214675",
+        "dws_rows": 100,
+        "cohort_rows": 200,
+        "biz_date": "2026-10-30"
+      }
+    },
+    {
+      "size": 100000,
+      "policy": "none",
+      "process_wall_seconds": 108.27414710004814,
+      "execution": {
+        "source_and_model_setup_seconds": 8.226289948999693,
+        "quality_seconds": 33.3739819249995,
+        "output_seconds": 43.28273553799954,
+        "spark_work_seconds": 84.88301448499988,
+        "cache_policy": "none",
+        "spark_conf": {
+          "spark.sql.shuffle.partitions": "2",
+          "spark.sql.adaptive.enabled": "true",
+          "spark.sql.autoBroadcastJoinThreshold": "10485760b"
+        },
+        "master": "local[2]",
+        "driver_memory": "768m"
+      },
+      "independent_verification": {
+        "passed": true,
+        "run_id": "perf-20261102-v2-n100000-none",
+        "orders": 100000,
+        "events": 179112,
+        "known_cents": "253214675",
+        "dws_rows": 100,
+        "cohort_rows": 200,
+        "biz_date": "2026-10-30"
+      }
+    }
+  ],
+  "queries": {
+    "10000": {
+      "spark_version": "3.5.7",
+      "method": "one warmup per variant then 3 timed actions each, alternating AB/BA/AB; OS caches uncontrolled; collect includes Spark scheduling",
+      "query_conf": {
+        "shuffle_partitions": 4,
+        "adaptive_enabled": false,
+        "auto_broadcast_threshold": -1
+      },
+      "layouts": {
+        "many-files": {
+          "write_seconds": 75.13490856399949,
+          "files": 320,
+          "bytes": 1546697,
+          "selected_day_files": 32,
+          "selected_day_bytes": 154530
+        },
+        "compact-files": {
+          "write_seconds": 3.990627334999772,
+          "files": 20,
+          "bytes": 229282,
+          "selected_day_files": 2,
+          "selected_day_bytes": 22898
+        }
+      },
+      "skew_partition_rows": {
+        "2": 487,
+        "0": 8360,
+        "1": 480,
+        "3": 673
+      },
+      "largest_partition_fraction": 0.836,
+      "pairs": {
+        "partition-pruning": {
+          "results_equal": true,
+          "result_rows": 89,
+          "result_sha256": "da68494de296c463ca97a1f4aa53276eff14564cc6099b8208eeabd43de1ecea",
+          "variants": {
+            "baseline": {
+              "seconds": [
+                0.533686939999825,
+                0.4390801409999767,
+                0.45113009600027
+              ],
+              "median_seconds": 0.45113009600027,
+              "sql_metrics": [
+                {
+                  "scan_files": 10,
+                  "selected_file_bytes": 140438,
+                  "shuffle_bytes_written": 2167
+                },
+                {
+                  "scan_files": 10,
+                  "selected_file_bytes": 140438,
+                  "shuffle_bytes_written": 2167
+                },
+                {
+                  "scan_files": 10,
+                  "selected_file_bytes": 140438,
+                  "shuffle_bytes_written": 2167
+                }
+              ],
+              "explain_sha256": {
+                "baseline-1.txt": "7a4bd97a6d68addf96d2f000f25b1889d0cfac97b2f09ee87e508751bdb31d6a",
+                "baseline-2.txt": "5c70ea326af58aaa27716f849926d990fd74943380755900d59a0de51ae957d3",
+                "baseline-3.txt": "9a3c3924a2e97bf8a35054b0c0f88022f16765fca7a66c80359bc79492cfb3c9"
+              }
+            },
+            "candidate": {
+              "seconds": [
+                0.35342070200022135,
+                0.2628496220004308,
+                0.2944186089998766
+              ],
+              "median_seconds": 0.2944186089998766,
+              "sql_metrics": [
+                {
+                  "scan_files": 1,
+                  "selected_file_bytes": 14084,
+                  "shuffle_bytes_written": 2167
+                },
+                {
+                  "scan_files": 1,
+                  "selected_file_bytes": 14084,
+                  "shuffle_bytes_written": 2167
+                },
+                {
+                  "scan_files": 1,
+                  "selected_file_bytes": 14084,
+                  "shuffle_bytes_written": 2167
+                }
+              ],
+              "explain_sha256": {
+                "candidate-1.txt": "16d8afd52d423065825c28741293b1b9e910980dd8e3e8100fb9c9b02c82f78a",
+                "candidate-2.txt": "5afa83b07b7558ed46f7a21c96c2d1206833c01b01d22fd0afeec6f16bd39a12",
+                "candidate-3.txt": "27afab39944492eb2e00782968400b9c18f66b72d133a6d6ed97dfcd1bd02ca9"
+              }
+            }
+          }
+        },
+        "broadcast-dimension": {
+          "results_equal": true,
+          "result_rows": 89,
+          "result_sha256": "755a39a896beaeb5fa729d4089b2ec29db8e77c1e41bcd098eb33bee39eb1051",
+          "variants": {
+            "baseline": {
+              "seconds": [
+                0.3094409260002067,
+                0.302101193999988,
+                0.26688937400012946
+              ],
+              "median_seconds": 0.302101193999988,
+              "sql_metrics": [
+                {
+                  "scan_files": 2,
+                  "selected_file_bytes": 18441,
+                  "shuffle_bytes_written": 6276
+                },
+                {
+                  "scan_files": 2,
+                  "selected_file_bytes": 18441,
+                  "shuffle_bytes_written": 6276
+                },
+                {
+                  "scan_files": 2,
+                  "selected_file_bytes": 18441,
+                  "shuffle_bytes_written": 6276
+                }
+              ],
+              "explain_sha256": {
+                "baseline-1.txt": "ef22e74d3740d951f86f5487b23ad62d58c67bd8884e199dec29f634b013ee51",
+                "baseline-2.txt": "e89f188df8e67ec74a0dac6fad73c46cfc935ce3c9103569482bbcef61415c7b",
+                "baseline-3.txt": "bc59bebf1bb1836f22243a1e477f1422aa1ba2040c0c6d318f077b4af7f502b5"
+              }
+            },
+            "candidate": {
+              "seconds": [
+                0.49219567500040284,
+                0.5105718849999903,
+                0.5274815389993819
+              ],
+              "median_seconds": 0.5105718849999903,
+              "sql_metrics": [
+                {
+                  "scan_files": 2,
+                  "selected_file_bytes": 18441,
+                  "shuffle_bytes_written": 2734
+                },
+                {
+                  "scan_files": 2,
+                  "selected_file_bytes": 18441,
+                  "shuffle_bytes_written": 2734
+                },
+                {
+                  "scan_files": 2,
+                  "selected_file_bytes": 18441,
+                  "shuffle_bytes_written": 2734
+                }
+              ],
+              "explain_sha256": {
+                "candidate-1.txt": "14393c646b27313b85324482c08f8788870aa083cfca8a1daa4bd101bf5b4371",
+                "candidate-2.txt": "4e7a95b8136f018f04bfa066a81dd7b7cf4cee018b282ce9dd69b1f7889b86d6",
+                "candidate-3.txt": "2b07bd69ee9f93ca9a9f7d5af3e216ac435d9405f8d3e6725861a3cf94822c03"
+              }
+            }
+          }
+        },
+        "small-files": {
+          "results_equal": true,
+          "result_rows": 89,
+          "result_sha256": "da68494de296c463ca97a1f4aa53276eff14564cc6099b8208eeabd43de1ecea",
+          "variants": {
+            "baseline": {
+              "seconds": [
+                0.8317434129994581,
+                0.8325832190002984,
+                0.8036930839998604
+              ],
+              "median_seconds": 0.8317434129994581,
+              "sql_metrics": [
+                {
+                  "scan_files": 32,
+                  "selected_file_bytes": 154530,
+                  "shuffle_bytes_written": 3195
+                },
+                {
+                  "scan_files": 32,
+                  "selected_file_bytes": 154530,
+                  "shuffle_bytes_written": 3195
+                },
+                {
+                  "scan_files": 32,
+                  "selected_file_bytes": 154530,
+                  "shuffle_bytes_written": 3195
+                }
+              ],
+              "explain_sha256": {
+                "baseline-1.txt": "491b84c51e5e5c659ad10de0297a58765c986e7c34f925cd392203b318e2c313",
+                "baseline-2.txt": "47025b6b11a9cf1536fc35b1e6abfbb97c96e252370160a216da7767e29304f3",
+                "baseline-3.txt": "e95082d001e6aa8690835b4445d21a53f730eb3bc9f939fa1a0fb27c5e1344bf"
+              }
+            },
+            "candidate": {
+              "seconds": [
+                0.1249279599996953,
+                0.12805826399926445,
+                0.13813838199985184
+              ],
+              "median_seconds": 0.12805826399926445,
+              "sql_metrics": [
+                {
+                  "scan_files": 2,
+                  "selected_file_bytes": 22898,
+                  "shuffle_bytes_written": 3272
+                },
+                {
+                  "scan_files": 2,
+                  "selected_file_bytes": 22898,
+                  "shuffle_bytes_written": 3272
+                },
+                {
+                  "scan_files": 2,
+                  "selected_file_bytes": 22898,
+                  "shuffle_bytes_written": 3272
+                }
+              ],
+              "explain_sha256": {
+                "candidate-1.txt": "52726b1ffd114b0536ebb0a901c53b91e0aa20bb38155590bf6c81f9ae4e1d3e",
+                "candidate-2.txt": "bbff89f5d0c54caecc73f06ba2cd74c0f3dd978d623c171536cffdf452012857",
+                "candidate-3.txt": "eeaa211f304593f354d2784807b1e6ac1dc5056be571a347d3524f1e9460bfe5"
+              }
+            }
+          }
+        },
+        "salted-aggregation": {
+          "results_equal": true,
+          "result_rows": 100,
+          "result_sha256": "0c9a99b6ac46a6581908fbaa85bc665acea66d24493ee01ce69448024b58ee34",
+          "variants": {
+            "baseline": {
+              "seconds": [
+                0.4014061830002902,
+                0.3765278359996955,
+                0.3644611959998656
+              ],
+              "median_seconds": 0.3765278359996955,
+              "sql_metrics": [
+                {
+                  "scan_files": 10,
+                  "selected_file_bytes": 140438,
+                  "shuffle_bytes_written": 4742
+                },
+                {
+                  "scan_files": 10,
+                  "selected_file_bytes": 140438,
+                  "shuffle_bytes_written": 4742
+                },
+                {
+                  "scan_files": 10,
+                  "selected_file_bytes": 140438,
+                  "shuffle_bytes_written": 4742
+                }
+              ],
+              "explain_sha256": {
+                "baseline-1.txt": "14bd765a1c2e611db6254d27e724f775e92b09a6084f0ec4e3e606f210793c1e",
+                "baseline-2.txt": "8c79446ceb50bfa9209a55cdda2990477a6105546a135e057aa07f8dc16e9da2",
+                "baseline-3.txt": "d761cefa6f56bcabb70d41f2f54199029d081231bb7008bd563071f380283d0b"
+              }
+            },
+            "candidate": {
+              "seconds": [
+                0.38999795699965034,
+                0.4017080530002204,
+                0.3992324259997986
+              ],
+              "median_seconds": 0.3992324259997986,
+              "sql_metrics": [
+                {
+                  "scan_files": 10,
+                  "selected_file_bytes": 140438,
+                  "shuffle_bytes_written": 36065
+                },
+                {
+                  "scan_files": 10,
+                  "selected_file_bytes": 140438,
+                  "shuffle_bytes_written": 36065
+                },
+                {
+                  "scan_files": 10,
+                  "selected_file_bytes": 140438,
+                  "shuffle_bytes_written": 36065
+                }
+              ],
+              "explain_sha256": {
+                "candidate-1.txt": "f7d827d58f6e64a45b080bf48e472b91ddfe3ea70563c107c0869d7375c9e307",
+                "candidate-2.txt": "3193209f5bc5511056987371daf0f0466a1bb3131d06f440b29d39678202c0b2",
+                "candidate-3.txt": "2ffce57fdb059514f85a828f7ea0bfd12025b0c76f886f1900aed9e497ad9e01"
+              }
+            }
+          }
+        }
+      }
+    },
+    "100000": {
+      "spark_version": "3.5.7",
+      "method": "one warmup per variant then 3 timed actions each, alternating AB/BA/AB; OS caches uncontrolled; collect includes Spark scheduling",
+      "query_conf": {
+        "shuffle_partitions": 4,
+        "adaptive_enabled": false,
+        "auto_broadcast_threshold": -1
+      },
+      "layouts": {
+        "many-files": {
+          "write_seconds": 73.16926019600032,
+          "files": 320,
+          "bytes": 3008558,
+          "selected_day_files": 32,
+          "selected_day_bytes": 300754
+        },
+        "compact-files": {
+          "write_seconds": 4.757957565999277,
+          "files": 20,
+          "bytes": 1318598,
+          "selected_day_files": 2,
+          "selected_day_bytes": 131905
+        }
+      },
+      "skew_partition_rows": {
+        "2": 4858,
+        "0": 83632,
+        "1": 4843,
+        "3": 6667
+      },
+      "largest_partition_fraction": 0.83632,
+      "pairs": {
+        "partition-pruning": {
+          "results_equal": true,
+          "result_rows": 100,
+          "result_sha256": "ae33412b81b08e4a84632aef0b230df96ff2207ceded4c86448d334c1b201c00",
+          "variants": {
+            "baseline": {
+              "seconds": [
+                0.5807057820002228,
+                0.545968978000019,
+                0.5010599240004012
+              ],
+              "median_seconds": 0.545968978000019,
+              "sql_metrics": [
+                {
+                  "scan_files": 10,
+                  "selected_file_bytes": 713597,
+                  "shuffle_bytes_written": 2363
+                },
+                {
+                  "scan_files": 10,
+                  "selected_file_bytes": 713597,
+                  "shuffle_bytes_written": 2363
+                },
+                {
+                  "scan_files": 10,
+                  "selected_file_bytes": 713597,
+                  "shuffle_bytes_written": 2363
+                }
+              ],
+              "explain_sha256": {
+                "baseline-1.txt": "75f8f3c28f62c5a9a1520e6e27d9827f34bac85d678f6eff3ec86bf5f524ef49",
+                "baseline-2.txt": "a4079a3ae8db7f4beaf4007d650c29bea2696de4b8d3be0baa279f47e7b81dfa",
+                "baseline-3.txt": "03089e9d790a0891904e82e70957bccf80d0058bd029e5cd49a3294b09e98347"
+              }
+            },
+            "candidate": {
+              "seconds": [
+                0.39538735000041925,
+                0.3944159060001766,
+                0.281789507999747
+              ],
+              "median_seconds": 0.3944159060001766,
+              "sql_metrics": [
+                {
+                  "scan_files": 1,
+                  "selected_file_bytes": 71184,
+                  "shuffle_bytes_written": 2363
+                },
+                {
+                  "scan_files": 1,
+                  "selected_file_bytes": 71184,
+                  "shuffle_bytes_written": 2363
+                },
+                {
+                  "scan_files": 1,
+                  "selected_file_bytes": 71184,
+                  "shuffle_bytes_written": 2363
+                }
+              ],
+              "explain_sha256": {
+                "candidate-1.txt": "b284cbb12d2e6d71b91db15cc04a063db6c4f50ce6970d9a6cf390701888fe5c",
+                "candidate-2.txt": "c09fb02290822533554aaebdacd064949ab38420c5efd4a97bd6196727684f9f",
+                "candidate-3.txt": "25ef3cebf01bc0511865ba3b65f95332056e09d5e732fbb8757e11c2ffd120f3"
+              }
+            }
+          }
+        },
+        "broadcast-dimension": {
+          "results_equal": true,
+          "result_rows": 100,
+          "result_sha256": "f331d1823eb8fbeb7abdcc21cb9792b8a7494a97ba6c7243ba195c547866693d",
+          "variants": {
+            "baseline": {
+              "seconds": [
+                0.2984143160001622,
+                0.30856157599919243,
+                0.2398725459997877
+              ],
+              "median_seconds": 0.2984143160001622,
+              "sql_metrics": [
+                {
+                  "scan_files": 2,
+                  "selected_file_bytes": 75548,
+                  "shuffle_bytes_written": 38955
+                },
+                {
+                  "scan_files": 2,
+                  "selected_file_bytes": 75548,
+                  "shuffle_bytes_written": 38955
+                },
+                {
+                  "scan_files": 2,
+                  "selected_file_bytes": 75548,
+                  "shuffle_bytes_written": 38955
+                }
+              ],
+              "explain_sha256": {
+                "baseline-1.txt": "d21aee5d8ddef0334bb89b29371f28dd9da1d36050078a62b69c6c5dc9ae6f6e",
+                "baseline-2.txt": "afab355c21e546d46b104f8e167124b787cb63ef5eb9fcbc4dab7c7f0e2d750e",
+                "baseline-3.txt": "bd97f9251fa9aa48fec4e72e042fa7ca7c0c99bccd756715b87402f5b3cfb5ab"
+              }
+            },
+            "candidate": {
+              "seconds": [
+                0.4900725950001288,
+                0.46513003400013986,
+                0.4956790849992103
+              ],
+              "median_seconds": 0.4900725950001288,
+              "sql_metrics": [
+                {
+                  "scan_files": 2,
+                  "selected_file_bytes": 75548,
+                  "shuffle_bytes_written": 3026
+                },
+                {
+                  "scan_files": 2,
+                  "selected_file_bytes": 75548,
+                  "shuffle_bytes_written": 3026
+                },
+                {
+                  "scan_files": 2,
+                  "selected_file_bytes": 75548,
+                  "shuffle_bytes_written": 3026
+                }
+              ],
+              "explain_sha256": {
+                "candidate-1.txt": "328ffed2073e2943b47e7749a08c0f4d8584c9b2743d7b25ec9d525e3f01eb1a",
+                "candidate-2.txt": "9ab0b29dd71e0165a874fe7ccd3d6fb9b76e9fcfbb19e9babaf01deaadf7979e",
+                "candidate-3.txt": "9b177a96df4babdab32a40cd1ca9e4224682f17ccc40658a4eaf79696267e480"
+              }
+            }
+          }
+        },
+        "small-files": {
+          "results_equal": true,
+          "result_rows": 100,
+          "result_sha256": "ae33412b81b08e4a84632aef0b230df96ff2207ceded4c86448d334c1b201c00",
+          "variants": {
+            "baseline": {
+              "seconds": [
+                0.8717153140005394,
+                0.7981034829999771,
+                0.7861057979998805
+              ],
+              "median_seconds": 0.7981034829999771,
+              "sql_metrics": [
+                {
+                  "scan_files": 32,
+                  "selected_file_bytes": 300754,
+                  "shuffle_bytes_written": 4839
+                },
+                {
+                  "scan_files": 32,
+                  "selected_file_bytes": 300754,
+                  "shuffle_bytes_written": 4839
+                },
+                {
+                  "scan_files": 32,
+                  "selected_file_bytes": 300754,
+                  "shuffle_bytes_written": 4839
+                }
+              ],
+              "explain_sha256": {
+                "baseline-1.txt": "491b84c51e5e5c659ad10de0297a58765c986e7c34f925cd392203b318e2c313",
+                "baseline-2.txt": "47025b6b11a9cf1536fc35b1e6abfbb97c96e252370160a216da7767e29304f3",
+                "baseline-3.txt": "e95082d001e6aa8690835b4445d21a53f730eb3bc9f939fa1a0fb27c5e1344bf"
+              }
+            },
+            "candidate": {
+              "seconds": [
+                0.16617770100037887,
+                0.14087815299990325,
+                0.1293071999998574
+              ],
+              "median_seconds": 0.14087815299990325,
+              "sql_metrics": [
+                {
+                  "scan_files": 2,
+                  "selected_file_bytes": 131905,
+                  "shuffle_bytes_written": 4868
+                },
+                {
+                  "scan_files": 2,
+                  "selected_file_bytes": 131905,
+                  "shuffle_bytes_written": 4868
+                },
+                {
+                  "scan_files": 2,
+                  "selected_file_bytes": 131905,
+                  "shuffle_bytes_written": 4868
+                }
+              ],
+              "explain_sha256": {
+                "candidate-1.txt": "52726b1ffd114b0536ebb0a901c53b91e0aa20bb38155590bf6c81f9ae4e1d3e",
+                "candidate-2.txt": "bbff89f5d0c54caecc73f06ba2cd74c0f3dd978d623c171536cffdf452012857",
+                "candidate-3.txt": "eeaa211f304593f354d2784807b1e6ac1dc5056be571a347d3524f1e9460bfe5"
+              }
+            }
+          }
+        },
+        "salted-aggregation": {
+          "results_equal": true,
+          "result_rows": 100,
+          "result_sha256": "063e3d61213a712754346ab944408c4942deceed9a8c988617938d6e26434b00",
+          "variants": {
+            "baseline": {
+              "seconds": [
+                0.3838455350005461,
+                0.3723689859998558,
+                0.3502148899997337
+              ],
+              "median_seconds": 0.3723689859998558,
+              "sql_metrics": [
+                {
+                  "scan_files": 10,
+                  "selected_file_bytes": 713597,
+                  "shuffle_bytes_written": 4706
+                },
+                {
+                  "scan_files": 10,
+                  "selected_file_bytes": 713597,
+                  "shuffle_bytes_written": 4706
+                },
+                {
+                  "scan_files": 10,
+                  "selected_file_bytes": 713597,
+                  "shuffle_bytes_written": 4706
+                }
+              ],
+              "explain_sha256": {
+                "baseline-1.txt": "b2dcffa5de9ff8d5f51853b539e6cdf9ae6aaf0f8f82279702ecc79e225b5645",
+                "baseline-2.txt": "44ea4ddf3a53f63a3cda44cf14a7ab75854a5fe7d8fc97e7dd5a38eb8621ba08",
+                "baseline-3.txt": "027dbd88337d4ef28ea59abaccd792fafc589f5aa202721c723a3fe9e61afd2c"
+              }
+            },
+            "candidate": {
+              "seconds": [
+                0.4604943340000318,
+                0.4169164160002765,
+                0.39928795199921296
+              ],
+              "median_seconds": 0.4169164160002765,
+              "sql_metrics": [
+                {
+                  "scan_files": 10,
+                  "selected_file_bytes": 713597,
+                  "shuffle_bytes_written": 46234
+                },
+                {
+                  "scan_files": 10,
+                  "selected_file_bytes": 713597,
+                  "shuffle_bytes_written": 46234
+                },
+                {
+                  "scan_files": 10,
+                  "selected_file_bytes": 713597,
+                  "shuffle_bytes_written": 46234
+                }
+              ],
+              "explain_sha256": {
+                "candidate-1.txt": "c74f6e4992f2b3246717a080e6ffb4319766eb9f3c5c519090eb6c64b9829eea",
+                "candidate-2.txt": "a092417199cbd29d6f45c670bf17f2899ffe6670c3f1825039a5e46a7eac1bf4",
+                "candidate-3.txt": "7bbbada049fbbac1746c5e6ee78cd10a5437fa7f73e218f71fb788726aa6c769"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

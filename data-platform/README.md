@@ -1,10 +1,11 @@
 # 离线数据开发模块
 
-已实现轻量主链：只读MySQL一致性抽取 → ODS冻结批次 → Spark SQL DIM/DWD/DWS/ADS → 质量门禁 → 版本发布。已用手算样本与真实MySQL读取验证；目前是本地小数据基线，没有性能规模、分布式部署或Airflow验收结论。
+已实现轻量主链：只读MySQL一致性抽取 → ODS冻结批次 → Spark SQL DIM/DWD/DWS/ADS → 质量门禁 → 版本发布。已用手算样本与真实MySQL读取验证，并完成本机1万/10万合成订单的SQL性能实验；没有分布式部署、生产吞吐或Airflow验收结论。
 
 - [数据契约](contracts/README.md)、[列白名单](contracts/source-contract.json)：粒度、金额、时区与未知历史。
 - [可手算样本](fixtures/hand-calculable/README.md)：14笔合成订单、3个情景快照与独立人工答案。
 - [分层SQL](sql/models.sql)：3个DIM、3个DWD、1个DWS、3个ADS。
+- [SQL与性能实验](benchmarks/README.md)：1万/10万确定性样本、缓存对照、分区/广播/文件/热点聚合实验及复现入口。
 - [抽取器](extract/mysql_snapshot.py)、[主链](jobs/offline_pipeline.py)、[宿主入口](tools/warehouse.py)。
 
 ## 快速复现
@@ -67,4 +68,4 @@ target/warehouse-venv/Scripts/python.exe -X utf8 data-platform/tests/acceptance.
 
 执行s1/s2/s3、手算对账、同批次重跑、发布前失败注入，保留机器报告。质量阻断包括：哈希/计数错误、非法类型/日期、重复主键、同订单多个付款事件、孤儿事件、付款时间不符、汇总金额/粒度不符。未投影事件、未知金额和缺维记录为明确警告，不静默推成0；报表要同时读取quality.json。
 
-下一步为受控数据规模与SQL性能实验，之后再接调度和按需Hive/HDFS/查询服务。当前未验证退款完整事件、CDC增量删除、对象存储发布、硬故障自动恢复或生产支付。
+可通过 `--cache-policy memory-and-disk` 复用DWD/DWS中间计算，默认none；发布版本中的execution.json记录实际策略和阶段耗时。性能实验方法和验收结果见上方实验说明。之后再接调度和按需Hive/HDFS/查询服务；当前未验证退款完整事件、CDC增量删除、对象存储发布、硬故障自动恢复或生产支付。

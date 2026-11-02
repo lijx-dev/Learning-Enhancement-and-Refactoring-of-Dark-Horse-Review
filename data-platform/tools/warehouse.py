@@ -18,13 +18,14 @@ def container_path(path):
     return '/workspace/' + path.relative_to(ROOT).as_posix()
 
 
-def spark_run(input_root, run_root, source_batch, biz_date, run_id, fail=False):
+def spark_run(input_root, run_root, source_batch, biz_date, run_id, fail=False, cache_policy='none'):
     safe_name(source_batch)
     safe_name(run_id)
     command = ['docker', '--context', 'desktop-linux', 'compose', '-f', 'dev/local/compose.yml',
         'run', '--rm', '--no-deps', 'spark', '--master', 'local[2]', '--driver-memory', '768m',
         '/workspace/data-platform/jobs/offline_pipeline.py', '--input-root', container_path(input_root),
-        '--run-root', container_path(run_root), '--source-batch', source_batch, '--biz-date', biz_date, '--run-id', run_id]
+        '--run-root', container_path(run_root), '--source-batch', source_batch, '--biz-date', biz_date, '--run-id', run_id,
+        '--cache-policy', cache_policy]
     if fail:
         command.append('--fail-before-publish')
     log = ROOT / 'target/warehouse-logs' / (run_id + '.log')
@@ -62,12 +63,13 @@ def main():
     run.add_argument('--biz-date', required=True)
     run.add_argument('--run-id', required=True)
     run.add_argument('--fail-before-publish', action='store_true')
+    run.add_argument('--cache-policy', choices=['none', 'memory-and-disk'], default='none')
     status = sub.add_parser('status')
     status.add_argument('--run-root', type=Path, default=ROOT / 'target/warehouse-v2')
     status.add_argument('--biz-date', required=True)
     args = parser.parse_args()
     if args.action == 'run':
-        raise SystemExit(spark_run(args.input_root, args.run_root, args.source_batch, args.biz_date, args.run_id, args.fail_before_publish))
+        raise SystemExit(spark_run(args.input_root, args.run_root, args.source_batch, args.biz_date, args.run_id, args.fail_before_publish, args.cache_policy))
     version, manifest = inspect(args.run_root, args.biz_date)
     print(json.dumps({'version': str(version), 'manifest': manifest}, ensure_ascii=False, indent=2))
 

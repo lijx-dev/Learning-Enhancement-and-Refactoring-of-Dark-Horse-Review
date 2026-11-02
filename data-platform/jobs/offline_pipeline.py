@@ -7,6 +7,7 @@ from pathlib import Path
 import re
 import shutil
 import sys
+from time import perf_counter
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from common import CONTRACT, PLATFORM, TABLES, exclusive_lock, publish, safe_name, sha256, utc_now, validate_snapshot, write_json
@@ -25,6 +26,7 @@ def scalar(spark, sql):
 
 
 def build(args, stage, manifest, source_counts):
+    from pyspark import StorageLevel
     from pyspark.sql import SparkSession
     from pyspark.sql import functions as f
     from pyspark.sql.types import StringType, StructField, StructType
@@ -33,6 +35,7 @@ def build(args, stage, manifest, source_counts):
         .config('spark.sql.shuffle.partitions', '2').config('spark.ui.enabled', 'false').getOrCreate())
     spark.sparkContext.setLogLevel('WARN')
     checks, warnings, counts = {}, [], {}
+    timing, started = {}, perf_counter()
     try:
         (stage / 'ods').mkdir(parents=True, exist_ok=True)
         shutil.copyfile(args.input_root / 'manifest.json', stage / 'ods/source_manifest.json')
@@ -47,7 +50,12 @@ def build(args, stage, manifest, source_counts):
             checks[table + '_source_count'] = df.count() == source_counts[table]
         for name, sql in MODELS.items():
             df = spark.sql(sql)
+            if args.cache_policy == 'memory-and-disk' and name in {
+                    'dwd_order_created', 'dwd_order_snapshot', 'dwd_order_event', 'dws_shop_order_day'}:
+                df = df.persist(StorageLevel.MEMORY_AND_DISK)
             df.createOrReplaceTempView(name)
+        timing['source_and_model_setup_seconds'] = perf_counter() - started
+        phase = perf_counter()
         checks['order_primary_key'] = scalar(spark, 'SELECT COUNT(*)=COUNT(DISTINCT order_id) FROM dwd_order_created')
         checks['event_primary_key'] = scalar(spark, 'SELECT COUNT(*)=COUNT(DISTINCT event_id) FROM dwd_order_event')
         checks['snapshot_primary_key'] = scalar(spark, 'SELECT COUNT(*)=COUNT(DISTINCT order_id) FROM dwd_order_snapshot')
@@ -81,6 +89,8 @@ def build(args, stage, manifest, source_counts):
         write_json(stage / 'quality.json', quality)
         if not quality['passed']:
             raise ValueError('Quality gate failed: ' + str([name for name, ok in checks.items() if not ok]))
+        timing['quality_seconds'] = perf_counter() - phase
+        phase = perf_counter()
         as_of = manifest.get('snapshot_as_of', manifest.get('scenario_as_of'))
         for name, (layer, partition) in OUTPUTS.items():
             df = spark.table(name)
@@ -94,6 +104,14 @@ def build(args, stage, manifest, source_counts):
             if partition:
                 writer = writer.partitionBy(partition)
             writer.parquet(str(stage / layer / name))
+        timing['output_seconds'] = perf_counter() - phase
+        timing['spark_work_seconds'] = perf_counter() - started
+        timing['cache_policy'] = args.cache_policy
+        timing['spark_conf'] = {key: spark.conf.get(key) for key in [
+            'spark.sql.shuffle.partitions', 'spark.sql.adaptive.enabled', 'spark.sql.autoBroadcastJoinThreshold']}
+        timing['master'] = spark.sparkContext.master
+        timing['driver_memory'] = spark.sparkContext.getConf().get('spark.driver.memory')
+        write_json(stage / 'execution.json', timing)
         return quality, counts, spark.version
     finally:
         spark.stop()
@@ -107,6 +125,7 @@ def main():
     parser.add_argument('--biz-date', required=True)
     parser.add_argument('--run-id', required=True)
     parser.add_argument('--fail-before-publish', action='store_true', help='Acceptance fault injection')
+    parser.add_argument('--cache-policy', choices=['none', 'memory-and-disk'], default='none')
     args = parser.parse_args()
     safe_name(args.run_id)
     safe_name(args.source_batch)

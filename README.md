@@ -251,4 +251,4 @@ docker compose -p hm-dianping -f dev/docker-compose.yml --profile monitoring up 
 
 本项目基于黑马点评课程及已有学习代码继续改造，保留原有 Git 历史。来源与第三方许可边界见 [开发约定](CONTRIBUTING.md#来源与许可边界)。
 
-已新增 [独立离线数仓模块](data-platform/README.md)，支持只读一致性抽取、Spark 分层、质量门禁、版本发布与迟到数据补算，并通过手算样本和本地 MySQL 小数据验收。模块说明提供部署、运行与验收命令；调度、规模性能与分布式组件尚未验收。后续方向见 [数据开发方向评估与路线](docs/数据开发方向评估与路线.md)。
+已新增 [独立离线数仓模块](data-platform/README.md)，支持只读一致性抽取、Spark 分层、质量门禁、版本发布与迟到数据补算，通过手算样本和本地 MySQL 小数据验收，并完成 [1万/10万订单的SQL性能实验](data-platform/benchmarks/README.md)。模块说明提供部署、运行与验收命令；调度与分布式组件尚未验收。后续方向见 [数据开发方向评估与路线](docs/数据开发方向评估与路线.md)。
