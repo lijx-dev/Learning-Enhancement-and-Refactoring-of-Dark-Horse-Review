@@ -1,0 +1,73 @@
+name: hmdp-hdfs
+
+x-hadoop: &hadoop
+  image: apache/hadoop:3.4.2
+  user: '0:0'
+  mem_limit: 768m
+  cpus: 0.5
+  environment:
+    HADOOP_CONF_DIR: /etc/hadoop-lab
+    HADOOP_LOG_DIR: /tmp/hadoop-logs
+    HADOOP_PID_DIR: /tmp/hadoop-pids
+    HADOOP_HEAPSIZE_MAX: '256'
+    HADOOP_USER_NAME: hmdp
+  entrypoint: [bash, /lab/entrypoint.sh]
+  volumes:
+    - ./hdfs:/etc/hadoop-lab:ro
+    - ./hdfs/entrypoint.sh:/lab/entrypoint.sh:ro
+  stop_grace_period: 30s
+
+services:
+  namenode:
+    <<: *hadoop
+    hostname: namenode
+    command: [namenode]
+    volumes:
+      - ./hdfs:/etc/hadoop-lab:ro
+      - ./hdfs/entrypoint.sh:/lab/entrypoint.sh:ro
+      - namenode-data:/storage/namenode
+    healthcheck:
+      test: [CMD-SHELL, 'HADOOP_HEAPSIZE_MAX=96 hdfs dfsadmin -safemode get']
+      interval: 15s
+      timeout: 15s
+      retries: 12
+      start_period: 20s
+  datanode:
+    <<: *hadoop
+    hostname: datanode
+    command: [datanode]
+    volumes:
+      - ./hdfs:/etc/hadoop-lab:ro
+      - ./hdfs/entrypoint.sh:/lab/entrypoint.sh:ro
+      - datanode-data:/storage/datanode
+    depends_on:
+      namenode:
+        condition: service_started
+    healthcheck:
+      test: [CMD-SHELL, 'HADOOP_HEAPSIZE_MAX=96 hdfs dfsadmin -report -live | grep -q "Live datanodes (1)"']
+      interval: 15s
+      timeout: 15s
+      retries: 12
+      start_period: 20s
+  spark:
+    image: apache/spark:3.5.7-scala2.12-java17-python3-ubuntu
+    profiles: [client]
+    user: '0:0'
+    working_dir: /workspace
+    mem_limit: 2048m
+    cpus: 2
+    environment:
+      SPARK_LOCAL_IP: 127.0.0.1
+      PYSPARK_PYTHON: python3
+      HADOOP_CONF_DIR: /etc/hadoop-lab
+      HADOOP_USER_NAME: hmdp
+      TZ: Asia/Shanghai
+      JAVA_TOOL_OPTIONS: '-Duser.timezone=Asia/Shanghai'
+    entrypoint: [/opt/spark/bin/spark-submit]
+    volumes:
+      - ../..:/workspace
+      - ./hdfs:/etc/hadoop-lab:ro
+
+volumes:
+  namenode-data:
+  datanode-data:
