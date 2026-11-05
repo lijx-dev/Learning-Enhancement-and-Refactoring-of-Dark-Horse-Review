@@ -71,6 +71,7 @@ class MockPaymentTest {
       s.order.setStatus(1);
       when(s.chain.update()).thenReturn(true);
       assertTrue(s.payMockOrder(88L, 8900L).getSuccess());
+      verify(s.chain).setSql("pay_time = NOW(3)");
       verify(s.chain).eq("user_id", 7L);
       verify(s.chain).eq("status", 1);
       clearInvocations(s.chain);

@@ -34,7 +34,9 @@ public class BusinessOutboxServiceImpl implements IBusinessOutboxService {
     if (!TransactionSynchronizationManager.isActualTransactionActive()) {
       throw new IllegalStateException("Outbox 必须与业务写入同事务");
     }
-    businessOutboxMapper.insertEvent(kind, aggregateId, userId);
+    if (businessOutboxMapper.insertEvent(kind, aggregateId, userId) != 1) {
+      throw new IllegalStateException("Outbox 事件未写入，回滚业务事务");
+    }
   }
 
   @Override

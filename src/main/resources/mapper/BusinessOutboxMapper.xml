@@ -17,8 +17,17 @@
     </resultMap>
 
     <insert id="insertEvent">
-        INSERT INTO tb_business_outbox(kind,aggregate_id,user_id)
-        VALUES(#{kind},#{aggregateId},#{userId})
+        <choose>
+            <when test='kind == "ORDER_PAID"'>
+                INSERT INTO tb_business_outbox(kind,aggregate_id,user_id,created_at)
+                SELECT #{kind},id,user_id,pay_time FROM tb_voucher_order
+                WHERE id=#{aggregateId} AND user_id=#{userId} AND status=2 AND pay_time IS NOT NULL
+            </when>
+            <otherwise>
+                INSERT INTO tb_business_outbox(kind,aggregate_id,user_id)
+                VALUES(#{kind},#{aggregateId},#{userId})
+            </otherwise>
+        </choose>
     </insert>
 
     <insert id="insertMediaDeletion">

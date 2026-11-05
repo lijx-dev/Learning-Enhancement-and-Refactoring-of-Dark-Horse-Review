@@ -5,7 +5,8 @@ spring:
     name: hmdp
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://127.0.0.1:3306/hmdp?useSSL=false&serverTimezone=UTC
+    # Match the local MySQL session timezone; override the URL for other deployments.
+    url: jdbc:mysql://127.0.0.1:3306/hmdp?useSSL=false&serverTimezone=Asia/Shanghai
     username: root
     password: ${SPRING_DATASOURCE_PASSWORD:}
   redis:

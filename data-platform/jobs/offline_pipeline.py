@@ -25,6 +25,21 @@ def scalar(spark, sql):
     return spark.sql(sql).first()[0]
 
 
+def payment_time_quality(spark):
+    """Whole-snapshot gate: tolerate small legacy drift, never change business-day attribution."""
+    row = spark.sql("""SELECT
+        COUNT(CASE WHEN pay_time_utc IS NULL THEN 1 END) AS missing,
+        COUNT(CASE WHEN skew_ms>=1000 AND skew_ms<60000 AND pay_date=event_date THEN 1 END) AS warning,
+        COUNT(CASE WHEN skew_ms>=60000 OR pay_date<>event_date THEN 1 END) AS blocking,
+        MAX(skew_ms) AS max_skew_ms
+        FROM (SELECT s.pay_time_utc,e.event_date,
+            to_date(from_utc_timestamp(s.pay_time_utc,'Asia/Shanghai')) AS pay_date,
+            abs(unix_millis(s.pay_time_utc)-unix_millis(e.occurred_at_utc)) AS skew_ms
+            FROM dwd_order_event e JOIN dwd_order_snapshot s ON e.order_id=s.order_id
+            WHERE e.event_type='ORDER_PAID')""").first().asDict()
+    return row
+
+
 def build(args, stage, manifest, source_counts):
     from pyspark import StorageLevel
     from pyspark.sql import SparkSession
@@ -63,7 +78,12 @@ def build(args, stage, manifest, source_counts):
         checks['event_dates'] = scalar(spark, 'SELECT COUNT(*) FROM dwd_order_event WHERE event_date IS NULL OR occurred_at_utc IS NULL OR processed_at_utc IS NULL') == 0
         checks['event_foreign_key'] = scalar(spark, 'SELECT COUNT(*) FROM dwd_order_event e LEFT ANTI JOIN dwd_order_created o ON e.order_id=o.order_id') == 0
         checks['paid_event_unique_order'] = scalar(spark, "SELECT COUNT(*)=COUNT(DISTINCT order_id) FROM dwd_order_event WHERE event_type='ORDER_PAID'")
-        checks['paid_time_matches'] = scalar(spark, "SELECT COUNT(*) FROM dwd_order_event e JOIN dwd_order_snapshot s ON e.order_id=s.order_id WHERE e.event_type='ORDER_PAID' AND (s.pay_time_utc IS NULL OR abs(unix_millis(s.pay_time_utc)-unix_millis(e.occurred_at_utc))>=1000)") == 0
+        paid_time = payment_time_quality(spark)
+        checks['paid_time_present'] = paid_time['missing'] == 0
+        checks['paid_time_consistent'] = paid_time['blocking'] == 0
+        if paid_time['warning']:
+            warnings.append({'rule': 'paid_time_skew', 'rows': paid_time['warning'],
+                             'warning_ms': 1000, 'blocking_ms': 60000})
         checks['dim_keys'] = all(scalar(spark, f'SELECT COUNT(*)=COUNT(DISTINCT {key}) FROM {model}') for model, key in [('dim_shop_snapshot', 'shop_id'), ('dim_voucher_snapshot', 'voucher_id')])
         missing_shop = scalar(spark, 'SELECT COUNT(*) FROM dwd_order_created o LEFT ANTI JOIN dim_shop_snapshot s ON o.shop_id=s.shop_id')
         missing_voucher = scalar(spark, 'SELECT COUNT(*) FROM dwd_order_created o LEFT ANTI JOIN dim_voucher_snapshot v ON o.voucher_id=v.voucher_id')
@@ -85,7 +105,8 @@ def build(args, stage, manifest, source_counts):
             ('paid_known_cents', "SELECT SUM(o.pay_cents) FROM dwd_order_event e JOIN dwd_order_created o ON e.order_id=o.order_id WHERE e.event_type='ORDER_PAID'")]:
             checks['reconcile_' + metric] = (scalar(spark, f'SELECT SUM({metric}) FROM dws_shop_order_day') or 0) == (scalar(spark, reference) or 0)
         quality = {'passed': all(checks.values()), 'checks': checks, 'warnings': warnings,
-                   'source_counts': source_counts, 'unprojected_order_events': pending, 'missing_dimensions': {'shops': missing_shop, 'vouchers': missing_voucher}}
+                   'source_counts': source_counts, 'payment_time': paid_time,
+                   'unprojected_order_events': pending, 'missing_dimensions': {'shops': missing_shop, 'vouchers': missing_voucher}}
         write_json(stage / 'quality.json', quality)
         if not quality['passed']:
             raise ValueError('Quality gate failed: ' + str([name for name, ok in checks.items() if not ok]))

@@ -398,7 +398,8 @@ public class VoucherOrderServiceImpl extends ServiceImpl<VoucherOrderMapper, Vou
           boolean changed =
               update()
                   .set("status", OrderStatus.PAID.getCode())
-                  .set("pay_time", LocalDateTime.now())
+                  // The paid Outbox event copies this database instant in the same transaction.
+                  .setSql("pay_time = NOW(3)")
                   .eq("id", orderId)
                   .eq("user_id", userId)
                   .eq("status", OrderStatus.UNPAID.getCode())

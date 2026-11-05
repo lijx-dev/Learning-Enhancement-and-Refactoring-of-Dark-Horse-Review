@@ -90,3 +90,16 @@ run-root/catalog的2026-10-30版本必须是合成s3，previous-version必须是
 输出在target/warehouse-hive-acceptance/<tag>：acceptance.json、两个Spark日志、build/reopen-report.json、执行计划、Derby目录及derby.log，全由Git忽略。本机最终验收目录为hive-20261105-final；此前失败目录保留诊断。总报告记录源码、输入与日志/计划/报告证据的SHA256。
 
 注意：ALTER TABLE SET LOCATION不会自动更新已登记分区的LOCATION，必须逐分区更新并REFRESH TABLE；SQL目录用未转义的绝对路径，不能把“=”误写为“%3D”。实验Metastore与正式发布catalog隔离，切换是单用户串行操作，不提供多表原子切换；该目录不能给多个Spark进程同时使用。Derby/单节点文件路径仅用于教学，不作为生产服务。外部表分区删除在本次固定版本实验中保留源文件，脚本前后逐文件核验；不要把这一结论套用到其他表类型或purge设置。
+
+
+## 付款时间回归
+
+V10 将付款时间统一为数据库毫秒时钟；付款 Outbox 复制订单 pay_time，enqueued_at 保留入队时刻。已有历史不会自动纠正。先在隔离 hmdp_optimization_test 库运行 PaymentClockIntegrationTest（测试业务写入回滚），再运行下方 Spark 验收：
+
+```powershell
+docker --context desktop-linux compose -f dev/local/compose.yml --profile test up -d --pull never --wait mysql-test redis-test
+docker --context desktop-linux compose -f dev/local/compose.yml run --rm --no-deps test mvn -o -B '-DargLine=-Xmx512m -Duser.timezone=UTC' '-Dtest=MockPaymentTest,PaymentClockIntegrationTest,MapperArchitectureTest' test
+target/warehouse-venv/Scripts/python.exe -X utf8 data-platform/tests/acceptance_payment_time.py --tag my-new-clock-check
+```
+
+Java 验证真实服务付款、幂等 Outbox、事件投影和 UTC SQL 文本导出；Spark 验证导出的业务记录，以及同一瞬间的不同偏移表示、2秒告警、60秒/8小时/跨业务日/缺失时间阻断及失败保留旧指针。这是隔离事务内合成订单的实际服务链路，不是生产支付或独立只读快照抽取器的端到端证明。详情见 [时间契约](contracts/README.md)。
