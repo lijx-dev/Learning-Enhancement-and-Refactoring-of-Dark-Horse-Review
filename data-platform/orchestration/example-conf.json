@@ -1,0 +1,8 @@
+{
+  "biz_date": "2026-10-30",
+  "source_batch": "s2",
+  "input_root": "target/warehouse-fixtures/hmdp_hand_v1/s2",
+  "run_root": "target/warehouse-orchestration/runs",
+  "cache_policy": "memory-and-disk",
+  "demo_fail_first": false
+}
