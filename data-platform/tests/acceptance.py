@@ -44,7 +44,9 @@ def main():
     if signature != logical_signature(version):
         raise ValueError('Failed run damaged previous published result')
     report = {'passed': True, 'verified_at_utc': utc_now(), 'cache_policy': args.cache_policy, 'fixture_results': results,
-        'replay_logical_results_equal': True, 'late_payment_old_date_corrected': results[1]['paid_orders'] == 5 and results[2]['paid_orders'] == 6,
+        'replay_logical_results_equal': True, 'late_payment_old_date_corrected': all(
+            result['paid_orders'] == sum(row['orders'] for row in fixture.expected(batch)['paid']
+                if row['biz_date'] == '2026-10-30') for result, batch in zip(results[1:], ('s2', 's3'))),
         'failure_preserves_catalog_and_old_artifacts': True, 'failed_run_retained': args.tag + '-fault'}
     write_json(args.run_root / ('acceptance-' + args.tag + '.json'), report)
     print(report)

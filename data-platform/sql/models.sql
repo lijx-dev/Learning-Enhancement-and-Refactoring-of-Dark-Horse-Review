@@ -2,6 +2,7 @@
 -- model: dim_shop_snapshot
 SELECT id AS shop_id,name,type_id,area,address,avg_price,score FROM tb_shop;
 -- model: dim_voucher_snapshot
+-- Current dimension at extraction time, not an order-time or SCD2 dimension.
 SELECT id AS voucher_id,shop_id,title,CAST(pay_value AS DECIMAL(38,0)) AS current_price_cents,type,status FROM tb_voucher;
 -- model: dwd_order_created
 SELECT id AS order_id,user_id,voucher_id,COALESCE(shop_id_snapshot,'UNKNOWN') AS shop_id,
@@ -24,9 +25,12 @@ SELECT event_id,order_id,event_type,to_timestamp(occurred_at) AS occurred_at_utc
        CASE WHEN event_type='ORDER_CLOSED' THEN 'unknown' ELSE NULL END AS close_reason
 FROM tb_order_event_history;
 -- model: dim_date
+-- A full calendar, including the preceding year for comparisons; facts are not zero-filled here.
 SELECT biz_date,year(biz_date) AS year,month(biz_date) AS month,dayofmonth(biz_date) AS day,
        weekofyear(biz_date) AS iso_week FROM (
-  SELECT biz_date FROM dwd_order_created UNION SELECT event_date FROM dwd_order_event
+  SELECT explode(sequence(make_date(year(min(day))-1,1,1),make_date(year(max(day)),12,31),interval 1 day)) AS biz_date
+  FROM (SELECT biz_date AS day FROM dwd_order_created UNION SELECT event_date FROM dwd_order_event
+        UNION SELECT biz_date FROM reporting_date)
 );
 -- model: created_day
 SELECT biz_date,shop_id,COUNT(*) AS created_orders,COUNT(DISTINCT user_id) AS created_users,

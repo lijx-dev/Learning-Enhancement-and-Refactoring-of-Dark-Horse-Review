@@ -2,41 +2,318 @@
   "note": "人工独立填写。每个数字的加法与逐单依据见README，生成程序不得改写此文件。金额单位分。",
   "s1": {
     "created": [
-      {"biz_date": "2026-10-29", "shop_id": "1", "orders": 4, "users": 3, "known_cents": 4000, "unknown_amount": 0, "free_orders": 1},
-      {"biz_date": "2026-10-29", "shop_id": "2", "orders": 2, "users": 2, "known_cents": 4500, "unknown_amount": 0, "free_orders": 0}
+      {
+        "biz_date": "2026-10-29",
+        "shop_id": "1",
+        "orders": 4,
+        "users": 3,
+        "known_cents": 4000,
+        "unknown_amount": 0,
+        "free_orders": 1
+      },
+      {
+        "biz_date": "2026-10-29",
+        "shop_id": "2",
+        "orders": 2,
+        "users": 2,
+        "known_cents": 4500,
+        "unknown_amount": 0,
+        "free_orders": 0
+      }
     ],
     "paid": [
-      {"biz_date": "2026-10-29", "shop_id": "1", "orders": 1, "known_cents": 1000},
-      {"biz_date": "2026-10-29", "shop_id": "2", "orders": 1, "known_cents": 1500}
+      {
+        "biz_date": "2026-10-29",
+        "shop_id": "1",
+        "orders": 1,
+        "known_cents": 1000,
+        "unknown_amount": 0
+      },
+      {
+        "biz_date": "2026-10-29",
+        "shop_id": "2",
+        "orders": 1,
+        "known_cents": 1500,
+        "unknown_amount": 0
+      }
     ],
-    "closed": [{"biz_date": "2026-10-29", "orders": 1}],
-    "status": [{"status": 1, "orders": 2}, {"status": 2, "orders": 3}, {"status": 4, "orders": 1}],
-    "counts": {"orders": 6, "outbox": 9, "history": 9, "missing_projection": 0}
+    "closed": [
+      {
+        "biz_date": "2026-10-29",
+        "orders": 1
+      }
+    ],
+    "status": [
+      {
+        "status": 1,
+        "orders": 2
+      },
+      {
+        "status": 2,
+        "orders": 3
+      },
+      {
+        "status": 4,
+        "orders": 1
+      }
+    ],
+    "counts": {
+      "orders": 6,
+      "outbox": 9,
+      "history": 9,
+      "missing_projection": 0
+    },
+    "min_order_id": "9007199254741001",
+    "event_dates": [
+      "2026-10-29"
+    ],
+    "closed_by_shop": [
+      {
+        "biz_date": "2026-10-29",
+        "shop_id": "1",
+        "orders": 1
+      }
+    ]
   },
   "s2": {
     "created": [
-      {"biz_date": "2026-10-29", "shop_id": "1", "orders": 4, "users": 3, "known_cents": 4000, "unknown_amount": 0, "free_orders": 1},
-      {"biz_date": "2026-10-29", "shop_id": "2", "orders": 2, "users": 2, "known_cents": 4500, "unknown_amount": 0, "free_orders": 0},
-      {"biz_date": "2026-10-30", "shop_id": "1", "orders": 3, "users": 3, "known_cents": 2000, "unknown_amount": 1, "free_orders": 0},
-      {"biz_date": "2026-10-30", "shop_id": "2", "orders": 5, "users": 5, "known_cents": 13500, "unknown_amount": 0, "free_orders": 0}
+      {
+        "biz_date": "2026-10-29",
+        "shop_id": "1",
+        "orders": 4,
+        "users": 3,
+        "known_cents": 4000,
+        "unknown_amount": 0,
+        "free_orders": 1
+      },
+      {
+        "biz_date": "2026-10-29",
+        "shop_id": "2",
+        "orders": 2,
+        "users": 2,
+        "known_cents": 4500,
+        "unknown_amount": 0,
+        "free_orders": 0
+      },
+      {
+        "biz_date": "2026-10-30",
+        "shop_id": "1",
+        "orders": 3,
+        "users": 3,
+        "known_cents": 2000,
+        "unknown_amount": 1,
+        "free_orders": 0
+      },
+      {
+        "biz_date": "2026-10-30",
+        "shop_id": "2",
+        "orders": 5,
+        "users": 5,
+        "known_cents": 13500,
+        "unknown_amount": 0,
+        "free_orders": 0
+      }
     ],
     "paid": [
-      {"biz_date": "2026-10-29", "shop_id": "1", "orders": 1, "known_cents": 1000},
-      {"biz_date": "2026-10-29", "shop_id": "2", "orders": 1, "known_cents": 1500},
-      {"biz_date": "2026-10-30", "shop_id": "2", "orders": 5, "known_cents": 15000}
+      {
+        "biz_date": "2026-10-29",
+        "shop_id": "1",
+        "orders": 1,
+        "known_cents": 1000,
+        "unknown_amount": 0
+      },
+      {
+        "biz_date": "2026-10-29",
+        "shop_id": "2",
+        "orders": 1,
+        "known_cents": 1500,
+        "unknown_amount": 0
+      },
+      {
+        "biz_date": "2026-10-30",
+        "shop_id": "2",
+        "orders": 5,
+        "known_cents": 15000,
+        "unknown_amount": 0
+      }
     ],
-    "closed": [{"biz_date": "2026-10-29", "orders": 1}, {"biz_date": "2026-10-30", "orders": 2}],
-    "status": [{"status": 1, "orders": 2}, {"status": 2, "orders": 6}, {"status": 3, "orders": 1}, {"status": 4, "orders": 3}, {"status": 5, "orders": 1}, {"status": 6, "orders": 1}],
-    "counts": {"orders": 14, "outbox": 25, "history": 23, "missing_projection": 2}
+    "closed": [
+      {
+        "biz_date": "2026-10-29",
+        "orders": 1
+      },
+      {
+        "biz_date": "2026-10-30",
+        "orders": 2
+      }
+    ],
+    "status": [
+      {
+        "status": 1,
+        "orders": 2
+      },
+      {
+        "status": 2,
+        "orders": 6
+      },
+      {
+        "status": 3,
+        "orders": 1
+      },
+      {
+        "status": 4,
+        "orders": 3
+      },
+      {
+        "status": 5,
+        "orders": 1
+      },
+      {
+        "status": 6,
+        "orders": 1
+      }
+    ],
+    "counts": {
+      "orders": 14,
+      "outbox": 25,
+      "history": 23,
+      "missing_projection": 2
+    },
+    "min_order_id": "9007199254741001",
+    "event_dates": [
+      "2026-10-29",
+      "2026-10-30"
+    ],
+    "closed_by_shop": [
+      {
+        "biz_date": "2026-10-29",
+        "shop_id": "1",
+        "orders": 1
+      },
+      {
+        "biz_date": "2026-10-30",
+        "shop_id": "1",
+        "orders": 2
+      }
+    ]
   },
   "s3": {
     "same_as": "s2",
     "paid": [
-      {"biz_date": "2026-10-29", "shop_id": "1", "orders": 1, "known_cents": 1000},
-      {"biz_date": "2026-10-29", "shop_id": "2", "orders": 1, "known_cents": 1500},
-      {"biz_date": "2026-10-30", "shop_id": "1", "orders": 1, "known_cents": 1000},
-      {"biz_date": "2026-10-30", "shop_id": "2", "orders": 5, "known_cents": 15000}
+      {
+        "biz_date": "2026-10-29",
+        "shop_id": "1",
+        "orders": 1,
+        "known_cents": 1000,
+        "unknown_amount": 0
+      },
+      {
+        "biz_date": "2026-10-29",
+        "shop_id": "2",
+        "orders": 1,
+        "known_cents": 1500,
+        "unknown_amount": 0
+      },
+      {
+        "biz_date": "2026-10-30",
+        "shop_id": "1",
+        "orders": 1,
+        "known_cents": 1000,
+        "unknown_amount": 0
+      },
+      {
+        "biz_date": "2026-10-30",
+        "shop_id": "2",
+        "orders": 5,
+        "known_cents": 15000,
+        "unknown_amount": 0
+      }
     ],
-    "counts": {"orders": 14, "outbox": 25, "history": 25, "missing_projection": 0}
+    "counts": {
+      "orders": 14,
+      "outbox": 25,
+      "history": 25,
+      "missing_projection": 0
+    }
+  },
+  "edges": {
+    "note": "独立手算扩展：A未知金额跨日付款；B仅关单日；C创建事件未投影。来源构造见acceptance_model_edges.py。",
+    "created": [
+      {
+        "biz_date": "2026-10-29",
+        "shop_id": "1",
+        "orders": 1,
+        "users": 1,
+        "known_cents": null,
+        "unknown_amount": 1,
+        "free_orders": 0
+      },
+      {
+        "biz_date": "2026-10-29",
+        "shop_id": "2",
+        "orders": 1,
+        "users": 1,
+        "known_cents": 100,
+        "unknown_amount": 0,
+        "free_orders": 0
+      },
+      {
+        "biz_date": "2026-10-31",
+        "shop_id": "1",
+        "orders": 1,
+        "users": 1,
+        "known_cents": 100,
+        "unknown_amount": 0,
+        "free_orders": 0
+      }
+    ],
+    "paid": [
+      {
+        "biz_date": "2026-10-30",
+        "shop_id": "1",
+        "orders": 1,
+        "known_cents": null,
+        "unknown_amount": 1
+      }
+    ],
+    "closed": [
+      {
+        "biz_date": "2026-11-01",
+        "orders": 1
+      }
+    ],
+    "closed_by_shop": [
+      {
+        "biz_date": "2026-11-01",
+        "shop_id": "2",
+        "orders": 1
+      }
+    ],
+    "event_dates": [
+      "2026-10-29",
+      "2026-10-30",
+      "2026-11-01"
+    ],
+    "status": [
+      {
+        "status": 1,
+        "orders": 1
+      },
+      {
+        "status": 2,
+        "orders": 1
+      },
+      {
+        "status": 4,
+        "orders": 1
+      }
+    ],
+    "min_order_id": "9007199254741001",
+    "counts": {
+      "orders": 3,
+      "history": 4,
+      "outbox": 5,
+      "missing_projection": 1
+    }
   }
 }

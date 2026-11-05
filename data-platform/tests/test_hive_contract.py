@@ -5,7 +5,7 @@ from pathlib import Path
 import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from acceptance_hive import validate_report
+from acceptance_hive import expected_paid_total, validate_report
 
 
 class HiveContractTest(unittest.TestCase):
@@ -13,7 +13,8 @@ class HiveContractTest(unittest.TestCase):
         expected = {'counts': {'orders': 1, 'history': 2},
             'created': [{'biz_date': '2026-10-30', 'shop_id': '1', 'orders': 1, 'known_cents': 1000}],
             'paid': [{'biz_date': '2026-10-30', 'shop_id': '1', 'orders': 1, 'known_cents': 1000}],
-            'closed': [{'biz_date': '2026-10-30', 'orders': 1}]}
+            'closed': [{'biz_date': '2026-10-30', 'orders': 1}],
+            'event_dates': ['2026-10-30']}
         snapshot = {k: deepcopy(expected[k]) for k in ('created', 'paid', 'closed')}
         snapshot.update(created_orders=1, all_events=2,
             partitions={'orders': ['biz_date=2026-10-30'], 'events': ['event_date=2026-10-30']})
@@ -50,6 +51,29 @@ class HiveContractTest(unittest.TestCase):
         report['mode'] = 'build'
         with self.assertRaises(ValueError):
             validate_report(report, expected)
+
+    def test_event_partitions_are_not_inferred_from_order_or_closed_dates(self):
+        report, expected = self.sample()
+        expected['after']['created'][0]['biz_date'] = '2026-10-31'
+        expected['after']['closed'] = []
+        expected['after']['event_dates'] = ['2026-10-29', '2026-10-30']
+        actual = report['snapshots']['after']
+        actual['created'][0]['biz_date'] = '2026-10-31'
+        actual['closed'] = []
+        actual['partitions'] = {'orders': ['biz_date=2026-10-31'],
+            'events': ['event_date=2026-10-29', 'event_date=2026-10-30']}
+        self.assertTrue(validate_report(report, expected))
+        actual['partitions']['events'].append('event_date=2026-10-31')
+        with self.assertRaises(ValueError):
+            validate_report(report, expected)
+
+    def test_paid_expectation_keeps_all_unknown_distinct_from_no_payments(self):
+        answer = {'paid': [{'biz_date': '2026-10-30', 'orders': 1,
+                           'known_cents': None, 'unknown_amount': 1}]}
+        self.assertEqual(expected_paid_total(answer, '2026-10-30'),
+            {'paid_orders': 1, 'paid_cents': None, 'paid_unknown_amount_orders': 1})
+        self.assertEqual(expected_paid_total(answer, '2026-10-31'),
+            {'paid_orders': 0, 'paid_cents': '0', 'paid_unknown_amount_orders': 0})
 
 
 if __name__ == '__main__':

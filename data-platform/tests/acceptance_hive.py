@@ -39,10 +39,19 @@ def validate_report(report, expected):
             if normalized(actual[metric]) != normalized(answer[metric]):
                 raise ValueError('Independent hand answer mismatch: ' + phase + '/' + metric)
         for table, field in [('orders', 'biz_date'), ('events', 'event_date')]:
-            wanted = sorted({field + '=' + row['biz_date'] for row in answer['created' if table == 'orders' else 'closed']})
+            dates = {row['biz_date'] for row in answer['created']} if table == 'orders' else set(answer['event_dates'])
+            wanted = sorted(field + '=' + day for day in dates)
             if actual['partitions'][table] != wanted:
                 raise ValueError('Partition keys mismatch')
     return True
+
+
+def expected_paid_total(answer, day):
+    rows = [row for row in answer['paid'] if row['biz_date'] == day]
+    known = [row['known_cents'] for row in rows if row['known_cents'] is not None]
+    return {'paid_orders': sum(row['orders'] for row in rows),
+            'paid_cents': str(sum(known)) if known or not rows else None,
+            'paid_unknown_amount_orders': sum(row['unknown_amount'] for row in rows)}
 
 
 def verified_version(path):
@@ -91,7 +100,10 @@ def main():
         events = records(version, 'dwd_order_event', 'dwd')
         amounts = {row['order_id']: row['pay_cents'] for row in orders}
         selected = [e for e in events if str(e['event_date']) == args.biz_date and e['event_type'] == 'ORDER_PAID']
-        arrow[batch] = {'paid_orders': len(selected), 'paid_cents': str(sum((amounts[e['order_id']] or Decimal(0) for e in selected), Decimal(0)))}
+        known = [amounts[e['order_id']] for e in selected if amounts[e['order_id']] is not None]
+        arrow[batch] = {'paid_orders': len(selected),
+            'paid_cents': str(sum(known, Decimal(0))) if known or not selected else None,
+            'paid_unknown_amount_orders': len(selected) - len(known)}
     report = {'passed': False, 'pyarrow': arrow, 'source_manifest_sha256': before_hash,
         'source_run_ids': [m['run_id'] for m in manifests],
         'code_sha256': {name: sha256(ROOT / name) for name in
@@ -100,8 +112,10 @@ def main():
         for mode in ('build', 'reopen'):
             command = COMPOSE + ['run', '--rm', '--no-deps', 'spark', '--master', 'local[2]', '--driver-memory', '768m',
                 '/workspace/dev/local/hive_smoke.py', '--version', container_path(current),
-                '--previous-version', container_path(previous), '--output', container_path(output / 'catalog'),
+                '--output', container_path(output / 'catalog'),
                 '--biz-date', args.biz_date, '--mode', mode]
+            if mode == 'build':
+                command += ['--previous-version', container_path(previous)]
             log = output / (mode + '-spark.log')
             with log.open('w', encoding='utf-8') as stream:
                 code = subprocess.run(command, cwd=ROOT, stdout=stream, stderr=subprocess.STDOUT).returncode
@@ -119,7 +133,7 @@ def main():
             verified_version(path)
             if sha256(path / 'run_manifest.json') != original:
                 raise ValueError('Published source manifest changed')
-        if arrow != {'s2': {'paid_orders': 5, 'paid_cents': '15000'}, 's3': {'paid_orders': 6, 'paid_cents': '16000'}}:
+        if arrow != {batch: expected_paid_total(fixture.expected(batch), args.biz_date) for batch in ('s2', 's3')}:
             raise ValueError('Independent PyArrow result differs from hand answer')
         report['evidence_sha256'] = {p.relative_to(output).as_posix(): sha256(p)
             for p in output.rglob('*') if p.is_file() and p.suffix in ('.log', '.txt', '.json')

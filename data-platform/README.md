@@ -103,3 +103,16 @@ target/warehouse-venv/Scripts/python.exe -X utf8 data-platform/tests/acceptance_
 ```
 
 Java 验证真实服务付款、幂等 Outbox、事件投影和 UTC SQL 文本导出；Spark 验证导出的业务记录，以及同一瞬间的不同偏移表示、2秒告警、60秒/8小时/跨业务日/缺失时间阻断及失败保留旧指针。这是隔离事务内合成订单的实际服务链路，不是生产支付或独立只读快照抽取器的端到端证明。详情见 [时间契约](contracts/README.md)。
+
+
+## 模型与Hive验收边界修复
+
+当前维快照不等于历史维；连续日历范围、UTC timestamp和空Parquet输出契约见contracts/README.md。对旧版本验收时须注意：旧产物的字符串 _snapshot_as_of 和观测日期集合不能满足新物理契约，应保留旧版本、使用新run-id重建，不能在原版本上改文件。
+
+新增3笔边界夹具，独立人工答案集中在expected.json。它验证未知金额付款、仅关单报表日、未投影创建日、连续日历、全部模型timestamp类型与UTC值、可读取的空结果；随后用Hive建表与独立进程重开核对分区和金额：
+
+```powershell
+target/warehouse-venv/Scripts/python.exe -X utf8 data-platform/tests/acceptance_model_edges.py --tag my-new-model-edges
+```
+
+Hive裁剪证据同时要求目标日期等值谓词和只包含目标日期的扫描位置，保存原Explain供复核；解析仅针对固定Spark 3.5.7格式，升级必须重验。reopen不再要求previous-version；Derby日志写入独立catalog目录，不改变Python工作目录。当前仍仅注册2个DWD表，DIM/DWS/ADS没有接入Hive，不能称为完整Hive数仓层。

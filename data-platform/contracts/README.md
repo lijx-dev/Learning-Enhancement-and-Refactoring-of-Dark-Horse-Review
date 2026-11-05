@@ -22,3 +22,14 @@ ADS提供店铺日订单排行、实际快照状态分布、券创建cohort表�
 模拟付款由 MySQL NOW(3) 写入 TIMESTAMP(3) pay_time，同事务付款 Outbox 的 created_at 复制该值，投影沿用该业务发生时间；enqueued_at 独立记录入队时间。V10 迁移将旧入队时间近似回填为旧 created_at，不能据此还原真实历史排队耗时，也不会改写已有事件历史。JDBC serverTimezone 必须与数据库会话解释一致；本地默认和 Compose 均为 Asia/Shanghai，抽取会话显式使用 UTC。不要在 +08 会话中直接把 UTC_TIMESTAMP 当本地时间写入 TIMESTAMP。
 
 门禁检查整个输入快照，不能只修日报而忽略历史异常。付款时间缺失、绝对差值达到 60000ms、或上海业务日不一致时阻断；同业务日差值在 [1000,60000)ms 时告警，小于1000ms正常。阈值是本地兼容旧记录的契约，不代表接受分钟级时钟漂移。quality.json 保留缺失、告警、阻断数量和最大偏差；严重时区错误不能仅靠放宽阈值发布。
+
+
+## 维度与物理时间类型
+
+dim_shop_snapshot、dim_voucher_snapshot 是本批抽取时点的当前维度。券 current_price_cents 和 status 仅描述当前价格/状态，不能回填历史订单、冒充创建时维度或 SCD2 历史维。订单金额仍只取订单快照列。
+
+dim_date 为连续日历：取订单创建日、已投影事件日和本次 biz_date 的并集，生成最早年份前一年1月1日至最晚年份12月31日的每一天，包含无业务日期，为同比预留上一年。空输入仍以 biz_date 决定范围。跨批次范围可能扩展；日历不自动为DWS补零，报表需日历左关联并定义空值口径。
+
+所有模型的 _snapshot_as_of 写为 Parquet timestamp，Spark会话统一UTC；读取端若得到无时区datetime，也必须按UTC解释。manifest的ISO8601时间继续用于可读元数据。空结果仍保留一份有schema的空Parquet，不输出没有schema的空分区目录。
+
+新发布manifest以model_contract_version=hmdp-model-v2标识本轮物理输出契约；来源快照契约仍为hmdp-offline-v1。旧产物保留，不就地改schema。

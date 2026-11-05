@@ -9,7 +9,8 @@ SELECT create_date AS biz_date, shop_id_snapshot AS shop_id,
 FROM fixture_orders GROUP BY create_date, shop_id_snapshot ORDER BY biz_date, shop_id;
 -- metric: paid
 SELECT h.event_date AS biz_date, o.shop_id_snapshot AS shop_id,
-       COUNT(DISTINCT o.id) AS orders, SUM(o.pay_value_snapshot) AS known_cents
+       COUNT(DISTINCT o.id) AS orders, SUM(o.pay_value_snapshot) AS known_cents,
+       SUM(CASE WHEN o.pay_value_snapshot IS NULL THEN 1 ELSE 0 END) AS unknown_amount
 FROM fixture_history h JOIN fixture_orders o ON h.order_id=o.id
 WHERE h.event_type='ORDER_PAID'
 GROUP BY h.event_date, o.shop_id_snapshot ORDER BY biz_date, shop_id;

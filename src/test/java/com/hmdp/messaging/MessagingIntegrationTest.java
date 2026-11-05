@@ -288,7 +288,14 @@ class MessagingIntegrationTest {
 
   @Test
   void concurrentDuplicateDeliveryCreatesOneHistoryAndOneInbox() throws Exception {
-    long id = append("ORDER_PAID", 102);
+    long orderId = 9150102L;
+    jdbc.update(
+        "INSERT INTO tb_voucher_order(id,user_id,voucher_id,status,pay_value_snapshot,pay_time) "
+            + "VALUES(?,?,?,2,100,NOW(3))",
+        orderId,
+        USER,
+        SKU);
+    long id = append("ORDER_PAID", orderId);
     BusinessEvent message = event(id);
     ExecutorService pool = Executors.newFixedThreadPool(8);
     try {

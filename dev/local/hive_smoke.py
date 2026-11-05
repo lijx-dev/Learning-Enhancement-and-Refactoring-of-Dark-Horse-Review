@@ -3,8 +3,9 @@
 import argparse
 from datetime import date
 import json
-import os
 from pathlib import Path
+import re
+from urllib.parse import unquote
 
 MODELS = {'orders': ('dwd_order_created', 'biz_date'), 'events': ('dwd_order_event', 'event_date')}
 
@@ -15,22 +16,36 @@ def literal(value):
     return "'" + value + "'"
 
 
+def pruning_evidence(plan, day):
+    """Fixed Spark 3.5 plan evidence; require both date equality and selected location."""
+    def field(name):
+        found = re.search(name + r':\s*(.*?)(?=\n\s*[A-Za-z][\w ]*:|\Z)', plan, re.S)
+        return found.group(1).strip() if found else ''
+    filters, location = field('PartitionFilters'), field('Location')
+    equality = bool(re.search(r'\bevent_date#\d+\s*=\s*(?:DATE\s*)?[\'\"]?'
+        + re.escape(day) + r'[\'\"]?(?=[\s),\]])', filters, re.I))
+    dates = sorted(set(re.findall(r'event_date=(\d{4}-\d{2}-\d{2})', unquote(location))))
+    return {'date_equality': equality, 'selected_partition_dates': dates,
+            'passed': equality and dates == [day]}
+
+
 def main():
     from pyspark.sql import SparkSession
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--version', type=Path, required=True)
-    parser.add_argument('--previous-version', type=Path, required=True)
+    parser.add_argument('--previous-version', type=Path)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--biz-date', required=True)
     parser.add_argument('--mode', choices=['build', 'reopen'], required=True)
     args = parser.parse_args()
+    if args.mode == 'build' and args.previous_version is None:
+        parser.error('--previous-version is required for build')
     day = date.fromisoformat(args.biz_date).isoformat()
     output = args.output.resolve()
     if args.mode == 'build':
         output.mkdir(parents=True, exist_ok=False)
     elif not (output / 'metastore_db').is_dir():
         raise ValueError('No existing catalog to reopen')
-    os.chdir(output)
     spark = (SparkSession.builder.appName('hmdp-hive-compatible-' + args.mode)
         .config('spark.sql.warehouse.dir', (output / 'warehouse').as_uri())
         .config('spark.hadoop.javax.jdo.option.ConnectionURL',
@@ -38,6 +53,7 @@ def main():
         .config('spark.sql.session.timeZone', 'UTC').config('spark.sql.ansi.enabled', 'true')
         .config('spark.sql.shuffle.partitions', '2').config('spark.ui.enabled', 'false')
         .enableHiveSupport().getOrCreate())
+    spark.sparkContext._jvm.java.lang.System.setProperty('derby.stream.error.file', (output / 'derby.log').as_posix())
     spark.sparkContext.setLogLevel('WARN')
     report = {'passed': False, 'mode': args.mode, 'spark_version': spark.version,
         'catalog_implementation': spark.conf.get('spark.sql.catalogImplementation'),
@@ -59,7 +75,8 @@ def main():
                     'SUM(CASE WHEN is_free THEN 1 ELSE 0 END) AS free_orders '
                     'FROM orders GROUP BY biz_date,shop_id ORDER BY biz_date,shop_id'),
                 'paid': rows("SELECT CAST(e.event_date AS STRING) AS biz_date,o.shop_id,COUNT(*) AS orders,"
-                    "SUM(o.pay_cents) AS known_cents FROM events e JOIN orders o ON e.order_id=o.order_id "
+                    "SUM(o.pay_cents) AS known_cents,SUM(CASE WHEN o.amount_known THEN 0 ELSE 1 END) AS unknown_amount "
+                    "FROM events e JOIN orders o ON e.order_id=o.order_id "
                     "WHERE e.event_type='ORDER_PAID' GROUP BY e.event_date,o.shop_id ORDER BY e.event_date,o.shop_id"),
                 'closed': rows("SELECT CAST(event_date AS STRING) AS biz_date,COUNT(*) AS orders "
                     "FROM events WHERE event_type='ORDER_CLOSED' GROUP BY event_date ORDER BY event_date"),
@@ -83,7 +100,7 @@ def main():
             spark.sql('ALTER TABLE events DROP PARTITION (event_date=' + literal(existing) + ')')
             report['checks']['external_partition_files_preserved'] = all(p.is_file() for p in files)
             missing = [r[0] for r in spark.sql('SHOW PARTITIONS events').collect()]
-            report['checks']['partition_removed_from_catalog'] = 'event_date=' + existing not in missing
+            report['checks']['partition_removed_from_catalog'] = ('event_date=' + existing) not in missing
             spark.sql('MSCK REPAIR TABLE events')
             report['checks']['repair_restored_results'] = query() == report['snapshots']['before']
             # Root LOCATION alone does not update existing partition locations.
@@ -109,7 +126,8 @@ def main():
             report['checks'][table + '_external_hive_serde'] = detail.get('Type') == 'EXTERNAL' and detail.get('Provider') == 'hive'
         plan = spark.sql('EXPLAIN FORMATTED SELECT COUNT(*) FROM events WHERE event_date=DATE ' + literal(day)).first()[0]
         (output / (args.mode + '-explain.txt')).write_text(plan, encoding='utf-8')
-        report['checks']['partition_pruning_observed'] = 'PartitionFilters:' in plan and 'event_date' in plan.split('PartitionFilters:')[1].splitlines()[0]
+        report['pruning_evidence'] = pruning_evidence(plan, day)
+        report['checks']['partition_pruning_observed'] = report['pruning_evidence']['passed']
         report['passed'] = report['catalog_implementation'] == 'hive' and all(report['checks'].values())
         if not report['passed']:
             raise ValueError('Catalog/partition checks failed: ' + str(report['checks']))

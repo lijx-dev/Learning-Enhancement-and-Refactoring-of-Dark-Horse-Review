@@ -12,7 +12,18 @@ from time import perf_counter
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from common import CONTRACT, PLATFORM, TABLES, exclusive_lock, publish, safe_name, sha256, utc_now, validate_snapshot, write_json
 
-MODELS = dict(re.findall(r'-- model: (\w+)\s*\n(.*?);', (PLATFORM / 'sql/models.sql').read_text(encoding='utf-8'), re.S))
+def parse_models(content):
+    # A semicolon inside a comment/string does not delimit a model.
+    blocks = re.split(r'^-- model:[ \t]*(\w+)[ \t]*$', content, flags=re.M)
+    models = {}
+    for name, sql in zip(blocks[1::2], blocks[2::2]):
+        if name in models or not sql.strip():
+            raise ValueError('Duplicate or empty model: ' + name)
+        models[name] = sql.strip()
+    return models
+
+
+MODELS = parse_models((PLATFORM / 'sql/models.sql').read_text(encoding='utf-8'))
 OUTPUTS = {
     'dim_shop_snapshot': ('dim', None), 'dim_voucher_snapshot': ('dim', None), 'dim_date': ('dim', None),
     'dwd_order_created': ('dwd', 'biz_date'), 'dwd_order_snapshot': ('dwd', None), 'dwd_order_event': ('dwd', 'event_date'),
@@ -63,6 +74,7 @@ def build(args, stage, manifest, source_counts):
             df = spark.read.schema(schema).option('mode', 'FAILFAST').json(str(ods / source.name))
             df.createOrReplaceTempView(table)
             checks[table + '_source_count'] = df.count() == source_counts[table]
+        spark.sql(f"SELECT DATE '{args.biz_date}' AS biz_date").createOrReplaceTempView('reporting_date')
         for name, sql in MODELS.items():
             df = spark.sql(sql)
             if args.cache_policy == 'memory-and-disk' and name in {
@@ -119,15 +131,18 @@ def build(args, stage, manifest, source_counts):
                 df = df.filter(f.col('biz_date') == f.lit(args.biz_date).cast('date'))
             df = (df.withColumn('_source_batch', f.lit(args.source_batch))
                 .withColumn('_source_env', f.lit(manifest['source_env']))
-                .withColumn('_snapshot_as_of', f.lit(as_of)))
+                .withColumn('_snapshot_as_of', f.to_timestamp(f.lit(as_of))))
             counts[name] = df.count()
             writer = df.coalesce(1).write.mode('errorifexists')
-            if partition:
+            # An empty partitioned write has no data file/schema for downstream readers.
+            # Keep one typed empty Parquet file at the model root in that case.
+            if partition and counts[name]:
                 writer = writer.partitionBy(partition)
             writer.parquet(str(stage / layer / name))
         timing['output_seconds'] = perf_counter() - phase
         timing['spark_work_seconds'] = perf_counter() - started
         timing['cache_policy'] = args.cache_policy
+        timing['phase_attribution'] = 'Wall-clock intervals; quality includes first actions and lazy cache materialization. Compare total job time across cache policies.'
         timing['spark_conf'] = {key: spark.conf.get(key) for key in [
             'spark.sql.shuffle.partitions', 'spark.sql.adaptive.enabled', 'spark.sql.autoBroadcastJoinThreshold']}
         timing['master'] = spark.sparkContext.master
@@ -168,7 +183,8 @@ def main():
             if sha256(args.input_root / 'manifest.json') != input_hash:
                 raise ValueError('Source manifest changed during run')
             artifacts = {str(p.relative_to(stage)).replace('\\', '/'): sha256(p) for p in stage.rglob('*') if p.is_file()}
-            record = {'run_id': args.run_id, 'source_batch': args.source_batch, 'biz_date': args.biz_date,
+            record = {'model_contract_version': 'hmdp-model-v2',
+                'run_id': args.run_id, 'source_batch': args.source_batch, 'biz_date': args.biz_date,
                 'source_env': manifest['source_env'], 'source_manifest_sha256': input_hash,
                 'synthetic': manifest.get('synthetic', False),
                 'payment_provenance': manifest.get('payment_provenance', manifest.get('payment', 'unknown')),

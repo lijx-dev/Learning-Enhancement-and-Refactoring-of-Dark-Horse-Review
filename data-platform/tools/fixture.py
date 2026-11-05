@@ -285,8 +285,9 @@ def spark_check(spec):
                 spark.table('fixture_orders').write.mode('overwrite').partitionBy('create_date').parquet(str(path))
                 restored = spark.read.parquet(str(path))
                 assert restored.count() == expected(batch)['counts']['orders']
-                assert restored.selectExpr('min(id) id').first().id == '9007199254741001'
-                assert restored.selectExpr('sum(pay_value_snapshot) cents').first().cents == (Decimal(8500) if batch == 's1' else Decimal(24000))
+                assert restored.selectExpr('min(id) id').first().id == expected(batch)['min_order_id']
+                assert restored.selectExpr('sum(pay_value_snapshot) cents').first().cents == sum(
+                    (Decimal(row['known_cents'] or 0) for row in expected(batch)['created']), Decimal(0))
             report[batch] = expected(batch)['counts']
         return dict(spark_version=spark.version, batches=report, parquet_repeat_overwrite=True)
     finally:
