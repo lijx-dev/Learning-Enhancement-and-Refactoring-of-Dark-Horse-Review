@@ -49,6 +49,10 @@ class BridgeTest(unittest.TestCase):
         self.assertFalse(bridge.execute_request(path, fail))
         with self.assertRaises(RuntimeError):
             bridge.wait_result(one, self.config)
+        failed = json.loads((self.queue / (one + '.result.json')).read_text())
+        self.assertIn('catalog_before_sha256', failed)
+        self.assertIn('catalog_after_sha256', failed)
+        self.assertEqual(failed['catalog_before_sha256'], failed['catalog_after_sha256'])
         two = bridge.submit(self.config, 'manual__demo', 2)
         self.assertNotEqual(one, two)
         self.assertEqual(len(calls), 1)
@@ -93,6 +97,10 @@ class BridgeTest(unittest.TestCase):
         bridge.execute_request(self.queue / (key + '.request.json'), publish_fake)
         result = bridge.wait_result(key, self.config)
         self.assertTrue(result['passed'])
+        # A later legitimate backfill changes latest; this attempt's immutable result stays valid.
+        write_json(self.root / self.config['run_root'] / 'catalog' / (self.config['biz_date'] + '.json'),
+                   {'version': 'versions/later-backfill'})
+        self.assertTrue(bridge.wait_result(key, self.config)['passed'])
         artifact = self.root / self.config['run_root'] / result['version'] / 'model.txt'
         artifact.write_text('corrupted', encoding='utf-8')
         with self.assertRaises(ValueError):

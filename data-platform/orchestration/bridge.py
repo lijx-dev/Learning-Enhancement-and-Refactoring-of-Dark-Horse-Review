@@ -126,9 +126,12 @@ def execute_request(path, runner):
     with claim.open('x', encoding='utf-8') as stream:
         json.dump({'pid': os.getpid(), 'claimed_at_utc': utc_now()}, stream)
     result = {'request_id': key, 'passed': False, 'started_at_utc': utc_now()}
+    catalog = None
     try:
         config = request['config']
         source, dest = validate_config(config)
+        catalog = dest / 'catalog' / (config['biz_date'] + '.json')
+        result['catalog_before_sha256'] = sha256(catalog) if catalog.exists() else None
         if datetime.fromisoformat(request['expires_at_utc']) < datetime.now(timezone.utc):
             raise TimeoutError('Queued request expired; no Spark job started')
         fail = config.get('demo_fail_first', False) and request['try_number'] == 1
@@ -144,6 +147,8 @@ def execute_request(path, runner):
             manifest_sha256=sha256(version / 'run_manifest.json'), quality=manifest['quality'])
     except Exception as failure:
         result['error'] = str(failure)
+    if catalog is not None:
+        result['catalog_after_sha256'] = sha256(catalog) if catalog.exists() else None
     result['completed_at_utc'] = utc_now()
     atomic_json(result_path, result)
     return True

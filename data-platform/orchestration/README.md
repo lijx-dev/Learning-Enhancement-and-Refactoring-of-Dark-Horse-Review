@@ -80,3 +80,15 @@ python -X utf8 data-platform/tools/airflow_control.py down
 关闭后保留target中的元数据、日志、队列与数仓版本；停止宿主worker后再收尾。不自动清理原始冻结批次或唯一补数来源。
 
 官方参考：[Airflow Docker](https://airflow.apache.org/docs/apache-airflow/2.11.0/howto/docker-compose/index.html)、[DAG Runs与catchup](https://airflow.apache.org/docs/apache-airflow/2.11.0/core-concepts/dag-run.html)。本轮运行结论来自固定版本镜像及实际状态、日志和业务产物验证；升级镜像后需重新执行验收。
+
+
+## 并发与重试验收口径
+
+当前是**单并发、阻塞式等待**：SequentialExecutor、parallelism=1、DAG max_active_runs=1；PythonOperator等待宿主worker最多16分钟，期间占用唯一执行槽位。两个dag_run同时触发时后者排队，这不是并行调度能力验证。若后续扩展，需要独立评估元数据库、Executor、资源和可延迟等待机制。
+
+自动重试验收使用固定Airflow 2.11元数据库中持久化task_fail记录、最终第二次尝试成功，以及第一/第二次worker结果。worker结果保留执行前后catalog哈希，用于证明故障注入没有替换旧指针；旧版本文件另独立核验。1秒轮询是否看见up_for_retry只记录为辅助信息，不再决定验收成败。此证据协议适用于本地串行、可信共享目录，不提供第三方并发发布的事务保证。
+
+read_success继续校验本次不可变版本，而不要求当前catalog仍指向它。后续合法补数替换最新指针，不会抹去先前任务成功事实；回归测试覆盖这一语义。若业务需要消费时确认最新版本，应另设计版本确认/协调协议，不能靠重复读取指针解决所有竞态。
+
+
+2026-11-05真实scheduler回归通过：s1/s2首尝试成功，s3第一尝试故障、第二尝试成功，task_fail持久化失败数为1，retry_verified_from_persisted_evidence=true，旧指针及不可变产物保护通过。报告target/warehouse-airflow-acceptance/airflow-review-20261105/report.json；本轮已停止scheduler，保留元数据和日志。

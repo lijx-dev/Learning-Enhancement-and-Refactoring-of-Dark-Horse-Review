@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 """Controlled query pairs over verified DWD Parquet, with plans and SQL metrics."""
 import argparse
+from datetime import date
 import hashlib
 import json
+import math
 from pathlib import Path
 from statistics import median
 import sys
@@ -16,7 +18,20 @@ def logical(rows):
     return sorted(json.dumps(row.asDict(), sort_keys=True, default=str) for row in rows)
 
 
+def validated_day(value):
+    if date.fromisoformat(value).isoformat() != value:
+        raise ValueError('biz-date must be YYYY-MM-DD')
+    return value
+
+
+def median_ratio(baseline, candidate):
+    if not all(math.isfinite(value) for value in (baseline, candidate)) or baseline < 0 or candidate <= 0:
+        return None
+    return baseline / candidate
+
+
 def metrics(plan):
+    # Spark 3.5.7 JVM internals: version-bound experimental evidence, not a stable API.
     found = []
     iterator = plan.metrics().iterator()
     values = {}
@@ -39,6 +54,7 @@ def main():
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--biz-date', required=True)
     args = parser.parse_args()
+    day = validated_day(args.biz_date)
     args.output.mkdir(parents=True, exist_ok=False)
     spark = (SparkSession.builder.appName('hmdp-sql-experiments')
         .config('spark.sql.session.timeZone', 'UTC').config('spark.sql.ansi.enabled', 'true')
@@ -50,11 +66,12 @@ def main():
         'method': 'one warmup per variant then 3 timed actions each, alternating AB/BA/AB; OS caches uncontrolled; collect includes Spark scheduling',
         'notes': 'Pair differences are named explicitly; no distributed throughput or cold-cache claim.'}
     try:
+        if spark.version != '3.5.7':
+            raise ValueError('SQL plan metrics are verified only for Spark 3.5.7; revalidate before upgrading')
         fact = spark.read.parquet(str(args.version / 'dwd/dwd_order_created'))
         dim = spark.read.parquet(str(args.version / 'dim/dim_shop_snapshot'))
         fact.createOrReplaceTempView('fact')
         dim.createOrReplaceTempView('shops')
-        day = args.biz_date
         selected = f"biz_date=DATE '{day}'"
         projection = 'shop_id,COUNT(*) AS orders,SUM(pay_cents) AS cents'
         # Plan evidence only: full and projected scans do different work, so no speed ratio.
@@ -98,7 +115,10 @@ def main():
                     raise ValueError(f'Expected {node} missing in {name}/{variant}')
             result = {'results_equal': True, 'result_rows': len(answer),
                 'result_sha256': hashlib.sha256('\n'.join(answer).encode()).hexdigest(),
-                'variants': results, 'baseline_over_candidate_median': results['baseline']['median_seconds'] / results['candidate']['median_seconds']}
+                'variants': results, 'baseline_over_candidate_median': median_ratio(
+                    results['baseline']['median_seconds'], results['candidate']['median_seconds'])}
+            if result['baseline_over_candidate_median'] is None:
+                result['ratio_unavailable_reason'] = 'Non-positive candidate or invalid timing measurement'
             report['pairs'][name] = result
             write_json(args.output / 'progress.json', report)
             print(json.dumps({'pair': name, 'ratio': result['baseline_over_candidate_median'], 'equal': True}), flush=True)
@@ -129,6 +149,8 @@ def main():
 
         # Show rows placed on each shuffle partition; this is not task runtime.
         distribution = fact.repartition(4, 'shop_id').withColumn('pid', f.spark_partition_id()).groupBy('pid').count().collect()
+        if not distribution or not sum(r['count'] for r in distribution):
+            raise ValueError('Skew experiment requires nonempty input')
         report['skew_partition_rows'] = {str(r['pid']): r['count'] for r in distribution}
         report['largest_partition_fraction'] = max(r['count'] for r in distribution) / sum(r['count'] for r in distribution)
         pair('salted-aggregation',

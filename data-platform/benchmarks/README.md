@@ -77,3 +77,15 @@ python -X utf8 data-platform/tools/warehouse.py run --input-root target/warehous
 ```powershell
 target/warehouse-venv/Scripts/python.exe -X utf8 data-platform/tests/acceptance.py --tag my-cache-regression --run-root target/warehouse-cache-acceptance --cache-policy memory-and-disk
 ```
+
+
+## 评审后的计时与兼容口径
+
+quality_seconds、output_seconds是按实际动作划分的墙钟区间。Spark惰性执行，MEMORY_AND_DISK首次物化通常发生在质量检查内；因此quality_seconds包含上游计算/缓存成本，output_seconds可能受复用而缩短。不要跨策略把单个阶段数字解释为纯校验或纯写入性能；比较完整进程时间或spark_work_seconds，并保留资源、版本和缓存状态。execution.json同时记录此归属说明。2026-11-02结果是历史版本证据，本轮连续日历及输出物理契约变化后，不把新旧作业耗时直接横比。
+
+SQL metrics经_jdf和JVM内部执行计划读取，仅在Spark 3.5.7验证；脚本明确拒绝其他版本，升级时需重新核查指标和Explain。biz-date必须是严格YYYY-MM-DD，进入SQL前校验；不可测或非正的候选中位数返回JSON null并记录原因，不输出伪造加速比。
+
+加盐实验仍使用整数分Decimal(38,0)和ANSI溢出失败保护，不转double。当前来源金额非负且不超过unsigned BIGINT，生成器最多10万订单，单组总和上界小于1.85×10^24，低于38位精度；非负局部和不大于总和。超出此规模、允许正负调整或更改金额范围时必须重新评估精度，不能外推该边界。当前数据下加盐没有收益，仍不加入正式主链。
+
+
+2026-11-05修复回归：1万订单/17913事件通过两种缓存策略的独立源/PyArrow核验，全部10个模型逻辑一致；日期裁剪、广播、小文件、加盐四组SQL各变体结果一致，实际JVM metrics与计划均成功保存。证据target/warehouse-scale/reports/perf-review-20261105/report.json。本次用于验证工具和正确性，不更新上方历史性能结论，也未重跑10万规模。

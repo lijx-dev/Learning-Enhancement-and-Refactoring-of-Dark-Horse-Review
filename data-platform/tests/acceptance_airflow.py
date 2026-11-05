@@ -3,6 +3,7 @@
 import argparse
 import json
 from pathlib import Path
+import hashlib
 import subprocess
 import sys
 import time
@@ -37,9 +38,21 @@ def metadata(run_id):
         "r=c.execute('SELECT state FROM dag_run WHERE dag_id=? AND run_id=?',(sys.argv[1],sys.argv[2])).fetchone(); "
         "t=c.execute('SELECT state,try_number,max_tries FROM task_instance WHERE dag_id=? AND run_id=? AND task_id=?',"
         "(sys.argv[1],sys.argv[2],'build_verify_publish')).fetchone(); "
+        "f=c.execute('SELECT COUNT(*) FROM task_fail WHERE dag_id=? AND run_id=? AND task_id=?',"
+        "(sys.argv[1],sys.argv[2],'build_verify_publish')).fetchone()[0]; "
         "print(json.dumps({'dag_state':r[0] if r else None,'task_state':t[0] if t else None,"
-        "'try_number':t[1] if t else None,'max_tries':t[2] if t else None})); c.close()")
+        "'try_number':t[1] if t else None,'max_tries':t[2] if t else None,'failed_attempts':f})); c.close()")
     return json.loads(capture(COMPOSE + ['exec', '-T', 'scheduler', 'python', '-c', code, DAG, run_id]))
+
+
+def validate_retry_evidence(snapshot, failed, previous_pointer_hash):
+    """Use persisted failures/attempt results; observing transient up_for_retry is optional."""
+    if snapshot['try_number'] != 2 or snapshot['failed_attempts'] != 1 or failed.get('passed') is not False:
+        raise ValueError('Automatic retry lacks a durable first failure and second attempt')
+    if (failed.get('catalog_before_sha256') != previous_pointer_hash
+            or failed.get('catalog_after_sha256') != previous_pointer_hash):
+        raise ValueError('Failed attempt did not preserve previous catalog')
+    return True
 
 
 def main():
@@ -113,23 +126,17 @@ def main():
                     write_json(output / 'progress.json', report)
                 observed_retry |= snapshot['task_state'] == 'up_for_retry'
                 failure_result = bridge.QUEUE / (failed_key + '.result.json')
-                if retry and not preserved and failure_result.exists():
-                    failed = json.loads(failure_result.read_text(encoding='utf-8'))
-                    if failed['passed']:
-                        raise ValueError('Injected first attempt unexpectedly passed')
-                    pointer, old_version, signature = prior
-                    if (run_root / 'catalog' / (day + '.json')).read_bytes() != pointer:
-                        raise ValueError('Failed attempt changed the previous catalog')
-                    if logical_signature(old_version) != signature:
-                        raise ValueError('Failed attempt damaged previous artifacts')
-                    preserved = True
                 if snapshot['dag_state'] == 'failed':
                     raise RuntimeError('Airflow marked DAG run failed: ' + run_id)
                 if snapshot['dag_state'] == 'success':
                     if snapshot['task_state'] != 'success' or snapshot['try_number'] != (2 if retry else 1):
                         raise ValueError('Unexpected Airflow task attempt count/state')
-                    if retry and not (observed_retry and preserved):
-                        raise ValueError('Retry transition/old version preservation was not observed')
+                    if retry:
+                        failed = json.loads(failure_result.read_text(encoding='utf-8'))
+                        pointer, old_version, signature = prior
+                        preserved = validate_retry_evidence(snapshot, failed, hashlib.sha256(pointer).hexdigest())
+                        if logical_signature(old_version) != signature:
+                            raise ValueError('Failed/retried attempt damaged previous immutable artifacts')
                     key = bridge.attempt_id(run_id, snapshot['try_number'])
                     result = bridge.wait_result(key, config, timeout_seconds=1)
                     verified = verify(run_root, day, batch, batch)
@@ -137,6 +144,7 @@ def main():
                         raise ValueError('Airflow run and published version identity differ')
                     record = {'airflow_run_id': run_id, 'task': snapshot, 'worker_attempt': key,
                         'verification': verified, 'up_for_retry_observed': observed_retry,
+                        'retry_verified_from_persisted_evidence': preserved if retry else None,
                         'failed_attempt_preserves_previous': preserved if retry else None,
                         'published_manifest_sha256': result['manifest_sha256']}
                     report['runs'].append(record)
