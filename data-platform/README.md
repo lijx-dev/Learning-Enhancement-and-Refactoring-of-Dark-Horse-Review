@@ -7,6 +7,7 @@
 - [分层SQL](sql/models.sql)：3个DIM、3个DWD、1个DWS、3个ADS。
 - [SQL与性能实验](benchmarks/README.md)：1万/10万确定性样本、缓存对照、分区/广播/文件/热点聚合实验及复现入口。
 - [本地调度](orchestration/README.md)：参数化DAG、受约束的宿主任务桥接；Airflow 2.11.0真实scheduler的按日运行、自动重试、旧版本保护及迟到补数已验收。
+- [Hive兼容表管理验收](tests/acceptance_hive.py)：Spark内嵌Hive Metastore、Parquet分区外部表、分区修复、版本切换及跨进程重开；复现见下文。
 - [抽取器](extract/mysql_snapshot.py)、[主链](jobs/offline_pipeline.py)、[宿主入口](tools/warehouse.py)。
 
 ## 快速复现
@@ -69,4 +70,23 @@ target/warehouse-venv/Scripts/python.exe -X utf8 data-platform/tests/acceptance.
 
 执行s1/s2/s3、手算对账、同批次重跑、发布前失败注入，保留机器报告。质量阻断包括：哈希/计数错误、非法类型/日期、重复主键、同订单多个付款事件、孤儿事件、付款时间不符、汇总金额/粒度不符。未投影事件、未知金额和缺维记录为明确警告，不静默推成0；报表要同时读取quality.json。
 
-可通过 `--cache-policy memory-and-disk` 复用DWD/DWS中间计算，默认none；发布版本中的execution.json记录实际策略和阶段耗时。性能实验方法和验收结果见上方实验说明。调度当前是schedule=None的手动参数化触发，自动日更/抽取选批、按需Hive/HDFS/查询服务仍待建设；当前未验证退款完整事件、CDC增量删除、对象存储发布、硬故障自动恢复或生产支付。
+可通过 `--cache-policy memory-and-disk` 复用DWD/DWS中间计算，默认none；发布版本中的execution.json记录实际策略和阶段耗时。性能实验方法和验收结果见上方实验说明。调度当前是schedule=None的手动参数化触发，自动日更/抽取选批、独立Hive/HDFS/查询服务仍待建设；当前未验证退款完整事件、CDC增量删除、对象存储发布、硬故障自动恢复或生产支付。
+
+## Hive兼容分区外部表
+
+复用Spark 3.5.7内置Hive Metastore 2.3.9类库和Derby 10.14.2.0，不下载新镜像。实验通过enableHiveSupport创建独立Derby目录，用真正的Hive SerDe外部表DDL（STORED AS PARQUET）注册两个DWD。数据仍是本地文件系统中的已发布版本，不是HDFS；没有启动独立Metastore服务、HiveServer2或Hive执行引擎。
+
+先准备已验证的s2、s3数仓版本（如果已有可跳过第一条，按实际目录替换参数）：
+
+```powershell
+target/warehouse-venv/Scripts/python.exe -X utf8 data-platform/tests/acceptance.py --tag hive-source-v1 --run-root target/hive-source-runs --cache-policy memory-and-disk
+target/warehouse-venv/Scripts/python.exe -X utf8 data-platform/tests/acceptance_hive.py --tag my-hive-test --run-root target/hive-source-runs --previous-version target/hive-source-runs/versions/2026-10-30/hive-source-v1-s2
+```
+
+run-root/catalog的2026-10-30版本必须是合成s3，previous-version必须是合成s2的完整已发布目录；不接受失败stage。每次tag换新名，输入损坏会先被哈希校验阻断。脚本依次启动两个Spark进程：第一个注册s2、SHOW PARTITIONS、移除一条分区元数据再MSCK REPAIR恢复，随后串行将表与所有已有分区LOCATION切换到s3；第二个进程重开同一Derby目录，直接查询持久化的表和分区。
+
+独立校验逐店创建数/去重人数/已知金额/未知金额/免费数、付款数与金额、每日关单数及分区集合，均与既有人工答案核对；PyArrow另从源Parquet计算付款关联。2026-11-05实测：s2为14订单23事件，s3为14订单25事件；10月30日模拟付款从5笔15000分修正为6笔16000分。两表各有10月29日、30日分区；EXPLAIN FORMATTED显示PartitionFilters及只选择event_date=2026-10-30的扫描位置。跨进程重开结果一致，所有源产物哈希保持不变。
+
+输出在target/warehouse-hive-acceptance/<tag>：acceptance.json、两个Spark日志、build/reopen-report.json、执行计划、Derby目录及derby.log，全由Git忽略。本机最终验收目录为hive-20261105-final；此前失败目录保留诊断。总报告记录源码、输入与日志/计划/报告证据的SHA256。
+
+注意：ALTER TABLE SET LOCATION不会自动更新已登记分区的LOCATION，必须逐分区更新并REFRESH TABLE；SQL目录用未转义的绝对路径，不能把“=”误写为“%3D”。实验Metastore与正式发布catalog隔离，切换是单用户串行操作，不提供多表原子切换；该目录不能给多个Spark进程同时使用。Derby/单节点文件路径仅用于教学，不作为生产服务。外部表分区删除在本次固定版本实验中保留源文件，脚本前后逐文件核验；不要把这一结论套用到其他表类型或purge设置。
