@@ -117,16 +117,16 @@ target/warehouse-venv/Scripts/python.exe -X utf8 data-platform/tests/acceptance_
 
 Hive裁剪证据同时要求目标日期等值谓词和只包含目标日期的扫描位置，保存原Explain供复核；解析仅针对固定Spark 3.5.7格式，升级必须重验。reopen不再要求previous-version；Derby日志写入独立catalog目录，不改变Python工作目录。当前仍仅注册2个DWD表，DIM/DWS/ADS没有接入Hive，不能称为完整Hive数仓层。
 
-## HDFS 最小实验（代码已就绪，真实服务验收待镜像补齐）
+## HDFS 最小实验（真实服务验收已通过）
 
 独立 [Compose](../dev/local/hdfs.compose.yml) 配置一个 NameNode、一个 DataNode，副本数1；两个服务各限768MiB/0.5 CPU，Spark客户端限2GiB/2 CPU。没有宿主端口、Kerberos、权限隔离或HA，仅适用于本机可信Docker网络。两个持久卷分别保存元数据和块数据，不使用Windows目录存放HDFS块。当前Docker数据盘链接到D盘，具体证据与资源边界见 [部署核查](../docs/Hive-HDFS-OLAP的D盘部署核查.md)。
 
-2026-11-05已通过配置、脚本保护与Python回归，**尚未启动真实HDFS服务**。Docker拉取因7897代理未运行失败，宿主直连镜像源读取清单成功、下载镜像层持续403。唯一缺失项为`apache/hadoop:3.4.2`的linux/amd64镜像，压缩层合计1,283,849,729字节（约1.20GiB；不是解压后的占盘量）。固定摘要如下，来自本轮镜像源返回的元数据，未完成官方registry独立复核：
+2026-11-09已补齐并核验`apache/hadoop:3.4.2`，**真实NameNode/DataNode服务验收通过**。此前下载失败记录仍保留作历史证据；当前镜像为linux/amd64，服务端Hadoop 3.4.2，Spark客户端Hadoop 3.3.4，固定摘要如下：
 
 | 类型 | SHA256 |
 | --- | --- |
-| linux/amd64 manifest | `0f79c18d27a2b15984868a41e245b09c98daa5638b573b4dbd848be650f05635` |
-| image config / Docker image ID | `3a8752e6b7603e5da5967212315849a26c85bd416f056abe1702b12919cced60` |
+| linux/amd64 manifest / RepoDigest | `0f79c18d27a2b15984868a41e245b09c98daa5638b573b4dbd848be650f05635` |
+| image config digest（镜像存储Id也可能显示manifest digest） | `3a8752e6b7603e5da5967212315849a26c85bd416f056abe1702b12919cced60` |
 
 可在网络可用处按摘要下载，并打上本地标签；也可在另一台机器`docker save`后在本机`docker load`。控制脚本会核对平台和固定image ID，错误标签不能绕过检查：
 
@@ -155,4 +155,6 @@ python -X utf8 data-platform/tools/hdfs_control.py down
 
 脚本随后重复`init`验证保留元数据，停止并重新启动本实验两个HDFS服务，核对clusterID、namespaceID、DataNode UUID；第二个Spark进程重开同一个本地Derby，重新校验HDFS哈希、表结果及写回结果，并在重启前后运行非空健康fsck。只有全部通过才写`acceptance.json`，失败留`failure.json`和日志，不自动删除失败目录/卷。脚本要求运行前HDFS已就绪，完成后保持服务原来的运行状态；上例最后手动`down`仅移除本实验容器/网络，保留命名卷，禁止加`-v`。同一实验集群、Derby目录一次仅允许一个验收进程。
 
-输出位于`target/warehouse-hdfs-acceptance/<tag>`，代码、输入、日志/计划/报告都有哈希。当前本机已重建输入位于`target/warehouse-hdfs-sources`，run-id为`hdfs-source-20261105-s2`和`hdfs-source-20261105-s3`。Spark/Hadoop客户端固定3.5.7/3.3.4，待验服务端固定3.4.2；具体镜像布局、跨版本读写及重启持久性仍须真实验收确认。DIM/DWS/ADS、Airflow主链仍使用原本地版本目录；HDFS发布指针、并发补数、独立Metastore/HiveServer2和OLAP均未接入。
+输出位于`target/warehouse-hdfs-acceptance/<tag>`，代码、输入、日志/计划/报告都有哈希。本次实测报告为`target/warehouse-hdfs-acceptance/hdfs-20261109-v1/acceptance.json`：两批各12个DWD文件，HDFS文件逐个读回SHA256一致；s2为14订单/23事件，s3为14订单/25事件，10月30日付款由5笔15000分修订为6笔16000分；两批均完成Hive外部表、分区裁剪和HDFS Parquet写回。重复init未重新格式化，重启后clusterID、NameNode namespaceID、DataNode UUID、fsck健康结果和第二个Spark进程查询结果保持一致，源产物哈希未改变。验收后已停止HDFS容器，命名卷保留。
+
+DIM/DWS/ADS、Airflow主链仍使用原本地版本目录；HDFS发布指针、并发补数、独立Metastore/HiveServer2和OLAP均未接入。此阶段只验证两张DWD的独立HDFS镜像与读写链路，不宣称全层迁移或生产级HA。

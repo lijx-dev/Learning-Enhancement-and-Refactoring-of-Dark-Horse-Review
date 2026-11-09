@@ -20,7 +20,8 @@ from acceptance_hive import normalized, verified_version
 def expected_files(path, manifest):
     result = {name: {'sha256': checksum, 'bytes': (path / name).stat().st_size}
         for name, checksum in manifest['artifacts'].items()
-        if any(name.startswith('dwd/' + model + '/') for model in ('dwd_order_created', 'dwd_order_event'))}
+        if not name.endswith('.crc')
+        and any(name.startswith('dwd/' + model + '/') for model in ('dwd_order_created', 'dwd_order_event'))}
     if not result or sum(item['bytes'] for item in result.values()) > 64 * 1024 * 1024:
         raise ValueError('Only small nonempty hand fixtures are supported')
     return result

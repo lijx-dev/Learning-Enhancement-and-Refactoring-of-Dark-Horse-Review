@@ -67,12 +67,12 @@
 
 本轮接手时openmaic-dev-db-postgres-1运行，保留原状；未停止或删除其他项目服务、数据卷。收尾仅清理hmdp-local实验网络。部署与复现入口见 [模块说明](../data-platform/README.md)。
 
-## 2026-11-05 HDFS部署配置与下载阻塞
+## 2026-11-05～2026-11-09 HDFS部署与实测
 
 本轮新增独立hmdp-hdfs项目：NameNode/DataNode各限768MiB、0.5 CPU，分别使用namenode-data/datanode-data命名卷；Spark客户端限2GiB、2 CPU、driver768m。服务加客户端内存上限合计3.5GiB，另需预留VM系统、缓存、其他容器和宿主内存；这些是配置预算，不是实测峰值。小样本错峰运行，不与Airflow/业务全栈/OLAP同时常驻。
 
 部署前核查快照：Docker VM约7.36GiB，宿主可用约2.4GiB，C盘空闲约3.5GiB、D盘约45.1GiB；空间随其他任务变化，上文历史数值不代表当前余量。主要Docker VHDX仍链接D:/DockerData/wsl/disk/docker_data.vhdx。本配置将元数据和块数据放Linux命名卷，按现有VHDX位置承载在D盘；Derby、配置、源Parquet与日志在项目D盘target目录。不能把Linux卷Mountpoint或容器df的虚拟容量当作D盘物理剩余空间。
 
-镜像固定apache/hadoop:3.4.2 linux/amd64，已从可达镜像源获得manifest/config摘要及压缩层总量约1.20GiB；完整解压占盘及真实服务内存仍未测。Docker拉取因7897代理未开启失败；宿主直连下载镜像层持续403，因此镜像未安装，没有启动真实NameNode/DataNode，也未生成本项目HDFS数据块。未调整全局代理、未迁移VHDX、未新增OLAP或独立Hive服务。下载清单与完整命令集中在 [模块说明](../data-platform/README.md)，避免把配置完成误读为部署验收完成。
+镜像固定apache/hadoop:3.4.2 linux/amd64，manifest/RepoDigest为`sha256:0f79c18d27a2b15984868a41e245b09c98daa5638b573b4dbd848be650f05635`，config摘要为`sha256:3a8752e6b7603e5da5967212315849a26c85bd416f056abe1702b12919cced60`。用户补齐后已实际启动并验收NameNode/DataNode；服务端Hadoop 3.4.2，Spark客户端Hadoop 3.3.4，完整证据见`target/warehouse-hdfs-acceptance/hdfs-20261109-v1/acceptance.json`。未调整全局代理、未迁移VHDX、未新增OLAP或独立Hive服务。
 
-本轮仅验证了Compose配置、启动脚本的模拟格式化保护和Python验收契约。后续必须实际核验镜像布局/版本、HDFS安全模式退出和DataNode注册、Spark 3.5.7内置Hadoop 3.3.4客户端连接Hadoop 3.4.2服务端、数据读写与重启持久性。单节点/副本1、simple认证和关闭HDFS权限仅限可信本机教学网络，不提供HA或容灾能力。
+本轮实际验证Compose配置、镜像布局、HDFS安全模式退出和DataNode注册、Spark 3.5.7内置Hadoop 3.3.4客户端连接Hadoop 3.4.2服务端、两批DWD文件读写、Hive外部表、Parquet写回、重启持久性和fsck健康。重复init未格式化，NameNode namespaceID与DataNode UUID保持不变。单节点/副本1、simple认证和关闭HDFS权限仅限可信本机教学网络，不提供HA或容灾能力；验收后服务已停止，命名卷仍保留。

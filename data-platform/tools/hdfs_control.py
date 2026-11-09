@@ -13,6 +13,10 @@ sys.path.insert(0, str(ROOT / 'data-platform'))
 from common import safe_name
 
 IMAGE = 'apache/hadoop:3.4.2'
+REPOSITORY = 'apache/hadoop'
+# Containerd image store reports the manifest digest as Id; the classic store
+# reports the config digest. Both are pinned, so either can identify this image.
+IMAGE_MANIFEST = 'sha256:0f79c18d27a2b15984868a41e245b09c98daa5638b573b4dbd848be650f05635'
 IMAGE_ID = 'sha256:3a8752e6b7603e5da5967212315849a26c85bd416f056abe1702b12919cced60'
 CLUSTER = 'CID-hmdp-lab-v1'
 COMPOSE = ['docker', '--context', 'desktop-linux', 'compose', '-f', 'dev/local/hdfs.compose.yml']
@@ -35,8 +39,14 @@ def require_image():
     image = json.loads(raw)
     if (image['Os'], image['Architecture']) != ('linux', 'amd64'):
         raise ValueError('HDFS requires the verified linux/amd64 image')
-    if image['Id'] != IMAGE_ID:
-        raise ValueError('Unexpected Hadoop image config digest; do not reuse a mutable tag')
+    descriptor = (image.get('Descriptor') or {}).get('digest')
+    pulled_by_digest = REPOSITORY + '@' + IMAGE_MANIFEST in image.get('RepoDigests', [])
+    if image['Id'] == IMAGE_ID:
+        pass
+    elif image['Id'] == IMAGE_MANIFEST and descriptor == IMAGE_MANIFEST and pulled_by_digest:
+        pass
+    else:
+        raise ValueError('Unexpected Hadoop image digest; do not reuse a mutable tag')
     return {key: image[key] for key in ('Id', 'RepoDigests', 'Os', 'Architecture')}
 
 

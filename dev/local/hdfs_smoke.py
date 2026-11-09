@@ -28,6 +28,8 @@ def source_files(source):
         raise ValueError('Only verified v2 synthetic sources allowed')
     files = {}
     for name, checksum in manifest['artifacts'].items():
+        if name.endswith('.crc'):
+            continue
         file = (path / name).resolve()
         if not file.is_relative_to(path) or file.is_symlink() or sha256(file) != checksum:
             raise ValueError('Invalid source artifact: ' + name)
@@ -125,7 +127,7 @@ def main():
                 for name in files:
                     destination = hp(staging + '/' + name)
                     fs.mkdirs(destination.getParent())
-                    fs.copyFromLocalFile(False, False, hp((source / name).as_uri()), destination)
+                    fs.copyFromLocalFile(False, False, hp(str(source / name)), destination)
                 hashes(staging, files)
                 if not fs.rename(hp(staging), hp(mirror)):
                     raise ValueError('HDFS source mirror rename failed')
